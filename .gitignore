@@ -35,15 +35,6 @@ hs_err_pid*
 # *.iml
 # *.ipr
 
-# CMake
-cmake-build-*/
-
-# Mongo Explorer plugin
-.idea/**/mongoSettings.xml
-
-# File-based project format
-*.iws
-
 # IntelliJ
 out/
 
@@ -85,4 +76,4 @@ gradle-app.setting
 
 ### Gradle Patch ###
 **/build/
-/.idea/
+/backend/.idea/
