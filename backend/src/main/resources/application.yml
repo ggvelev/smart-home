@@ -1,0 +1,47 @@
+spring.profiles.active: local
+
+#server:
+#  port:
+#  ssl:
+#    enabled:
+#    protocol:
+#    enabled-protocols:
+#    key-alias:
+#    key-password:
+#    key-store:
+#    key-store-type:
+#    key-store-password:
+#    ciphers:
+#    client-auth: # possible options are: none - want (optional) - need (must) -> use for mTLS
+
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    schema:
+    data:
+
+  jpa:
+    hibernate.ddl-auto: validate
+
+# JSON Web Token config properties
+jwt:
+  token:
+    secret: # Base64 encoded secret
+    issuer:
+    ttl-in-seconds:
+
+# MQTT properties
+mqtt:
+  server:
+    host:
+    port:
+
+  client:
+    username:
+    password:
+    id:
+    lwt: # last will and testament
+      topic:
+      message:
