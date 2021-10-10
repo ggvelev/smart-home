@@ -18,51 +18,30 @@ repositories {
 	mavenCentral()
 }
 
-ext {
-	set('testcontainersVersion', "1.16.0")
-}
-
 dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-//	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-//	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-//	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-//	implementation 'org.springframework.data:spring-data-rest-hal-explorer'
-//	implementation 'org.springframework.kafka:spring-kafka'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
 	implementation 'com.hivemq:hivemq-mqtt-client:1.2.2'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+	implementation 'com.slack.api:slack-api-client:1.12.1'
+
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2', 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 //	runtimeOnly 'io.micrometer:micrometer-registry-influx'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-//	testImplementation 'org.springframework.kafka:spring-kafka-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation 'org.testcontainers:junit-jupiter'
-//	testImplementation 'org.testcontainers:kafka'
-//	testImplementation 'org.testcontainers:postgresql'
 
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
 	testCompileOnly 'org.projectlombok:lombok:1.18.20'
 	testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
-	}
 }
 
 test {
