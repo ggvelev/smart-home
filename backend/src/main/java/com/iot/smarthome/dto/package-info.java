@@ -24,6 +24,6 @@
  ******************************************************************************/
 
 /**
- * Contains POJOs representing HTTP response objects
+ * Contains data transfer object (DTO) classes
  */
-package com.iot.smarthome.controller.response;
+package com.iot.smarthome.dto;
