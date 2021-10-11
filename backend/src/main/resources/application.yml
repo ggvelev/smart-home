@@ -1,47 +1,66 @@
 spring.profiles.active: local
 
-#server:
-#  port:
-#  ssl:
-#    enabled:
-#    protocol:
-#    enabled-protocols:
-#    key-alias:
-#    key-password:
-#    key-store:
-#    key-store-type:
-#    key-store-password:
-#    ciphers:
-#    client-auth: # possible options are: none - want (optional) - need (must) -> use for mTLS
+logging:
+  level:
+    root: ${LOGGING_LEVEL_ROOT:info}
+
+server:
+  port: ${SERVER-PORT:8443}
+  ssl:
+    enabled: ${SSL-ENABLED:}
+    protocol: ${SSL-PROTOCOL:}
+    enabled-protocols: ${SSL-ENABLED-PROTOCOLS:}
+    key-alias: ${SSL-KEY-ALIAS:}
+    key-password: ${SSL-KEY-PASSWORD:}
+    key-store: ${SSL-KEY-STORE:}
+    key-store-type: ${SSL-KEY-STORE-TYPE:}
+    key-store-password: ${SSL-KEY-STORE-PASSWORD:}
+    ciphers: ${SSL-CIPHERS:}
+    client-auth: ${SSL-CLIENT-AUTH:} # possible options are: none - want (optional) - need (must) -> use for mTLS
 
 spring:
   datasource:
-    url:
-    username:
-    password:
-    schema:
-    data:
-
+    url: ${DATASOURCE-URL:}
+    username: ${DATASOURCE-USERNAME:}
+    password: ${DATASOURCE-PASSWORD:}
+    schema: ${DATASOURCE-SCHEMA-SQL:}
+    data: ${DATASOURCE-DATA-SQL:}
   jpa:
     hibernate.ddl-auto: validate
+    show-sql: ${JPA-SHOW-SQL:false}
+    properties:
+      hibernate.format_sql: ${HIBERNATE-FORMAT-SQL:false}
+      hibernate.globally_quoted_identifiers: ${HIBERNATE_GLOBALLY-QUOTED-IDENTIFIERS:false}
+  mail:
+    host: ${MAIL-HOST:}
+    port: ${MAIL-PORT:}
+    username: ${MAIL-USERNAME:}
+    password: ${MAIL-PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL-SMTP-AUTH:true}
+      mail.smtp.starttls.enable: ${MAIL-SMTP-TLS:true}
+
+# Slack client config
+slack:
+  token: ${SLACK-TOKEN:}
+  channel: ${SLACK-CHANNEL:#smarthome-events} # Default channel where notifications are sent
 
 # JSON Web Token config properties
 jwt:
   token:
-    secret: # Base64 encoded secret
-    issuer:
-    ttl-in-seconds:
+    secret: ${JWT-SECRET:} # Base64 encoded secret
+    issuer: ${JWT-ISSUER:}
+    ttl-in-seconds: ${JWT-TTL-IN-SECONDS:}
 
 # MQTT properties
 mqtt:
   server:
-    host:
-    port:
-
+    host: ${MQTT-SERVER-HOST:}
+    port: ${MQTT-SERVER-PORT:}
   client:
-    username:
-    password:
-    id:
+    username: ${MQTT-CLIENT-USERNAME:}
+    password: ${MQTT-CLIENT-PASSWORD:}
+    id: ${MQTT-CLIENT-ID:}
     lwt: # last will and testament
-      topic:
-      message:
+      topic: ${MQTT-LWT-TOPIC:}
+      message: ${MQTT-LWT-MESSAGE:}
