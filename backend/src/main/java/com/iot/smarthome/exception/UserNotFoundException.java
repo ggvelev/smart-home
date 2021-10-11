@@ -29,15 +29,11 @@ import static java.lang.String.format;
 
 public class UserNotFoundException extends RuntimeException {
 
-    private String field;
-    private String value;
-
-    public UserNotFoundException(String message) {
-        super(message);
-    }
+    private final String field;
+    private final String value;
 
     public UserNotFoundException(String field, String value) {
-        this(format("User with '%s=%s' was not found", field, value));
+        super(format("User with '%s=%s' was not found", field, value));
         this.field = field;
         this.value = value;
     }
