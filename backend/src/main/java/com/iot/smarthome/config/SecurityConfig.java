@@ -91,6 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, USERS).permitAll()
                 .antMatchers(POST, USER_ACTIVATION).permitAll()
                 .antMatchers(POST, USER_RECOVERY).permitAll()
+                .antMatchers(GET, OPEN_API_DOCS).permitAll()
+                .mvcMatchers(GET, OPEN_API_UI).permitAll()
 
                 .antMatchers(GET, DEVICES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(POST, DEVICES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
