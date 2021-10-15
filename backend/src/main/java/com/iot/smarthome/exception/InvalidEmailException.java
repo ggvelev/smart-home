@@ -27,22 +27,9 @@ package com.iot.smarthome.exception;
 
 import static java.lang.String.format;
 
-public class UserNotFoundException extends RuntimeException {
+public class InvalidEmailException extends RuntimeException {
 
-    private final String field;
-    private final String value;
-
-    public UserNotFoundException(String field, String value) {
-        super(format("User with %s='%s' was not found", field, value));
-        this.field = field;
-        this.value = value;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getValue() {
-        return value;
+    public InvalidEmailException(String email) {
+        super(format("The provided email '%s' is not a valid email address", email));
     }
 }

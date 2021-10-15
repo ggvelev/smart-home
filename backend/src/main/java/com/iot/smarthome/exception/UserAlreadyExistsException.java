@@ -27,13 +27,13 @@ package com.iot.smarthome.exception;
 
 import static java.lang.String.format;
 
-public class UserNotFoundException extends RuntimeException {
+public class UserAlreadyExistsException extends RuntimeException {
 
     private final String field;
     private final String value;
 
-    public UserNotFoundException(String field, String value) {
-        super(format("User with %s='%s' was not found", field, value));
+    public UserAlreadyExistsException(String field, String value) {
+        super(format("User with %s '%s' already exists", field, value));
         this.field = field;
         this.value = value;
     }

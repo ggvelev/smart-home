@@ -25,24 +25,12 @@
 
 package com.iot.smarthome.exception;
 
-import static java.lang.String.format;
+public class PasswordStrengthException extends RuntimeException {
 
-public class UserNotFoundException extends RuntimeException {
-
-    private final String field;
-    private final String value;
-
-    public UserNotFoundException(String field, String value) {
-        super(format("User with %s='%s' was not found", field, value));
-        this.field = field;
-        this.value = value;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getValue() {
-        return value;
+    public PasswordStrengthException() {
+        super("Password not strong enough. Must be minimum eight characters and " +
+                      "must have at least one of the following: " +
+                      "upper case English letter, lower case English letter, " +
+                      "digit, special character.");
     }
 }
