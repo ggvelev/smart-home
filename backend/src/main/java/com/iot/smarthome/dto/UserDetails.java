@@ -37,21 +37,18 @@ import java.util.UUID;
  */
 public class UserDetails {
 
-    @JsonProperty
     private final UUID uuid;
 
-    @JsonProperty
     private final String username;
 
-    @JsonProperty
     @Email
     private final String email;
 
-    @JsonProperty
     private final Set<String> authorities;
 
     @JsonCreator
-    public UserDetails(UUID uuid, String username, String email, Set<String> authorities) {
+    public UserDetails(@JsonProperty("uuid") UUID uuid, @JsonProperty("username") String username,
+                       @JsonProperty("email") String email, @JsonProperty("authorities") Set<String> authorities) {
         this.uuid = uuid;
         this.username = username;
         this.email = email;

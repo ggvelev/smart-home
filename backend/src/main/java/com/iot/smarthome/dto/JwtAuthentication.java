@@ -37,18 +37,16 @@ public class JwtAuthentication {
     /**
      * Serialized JWT token
      */
-    @JsonProperty
     private final String token;
 
     /**
      * Authenticated principal's details
      */
-    @JsonProperty
     private final UserDetails userDetails;
 
     @JsonCreator
-    public JwtAuthentication(String token,
-                             UserDetails userDetails) {
+    public JwtAuthentication(@JsonProperty("token") String token,
+                             @JsonProperty("userDetails") UserDetails userDetails) {
         this.token = token;
         this.userDetails = userDetails;
     }

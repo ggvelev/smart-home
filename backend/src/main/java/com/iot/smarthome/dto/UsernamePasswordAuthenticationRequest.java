@@ -30,14 +30,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UsernamePasswordAuthenticationRequest {
 
-    @JsonProperty
     private final String username;
 
-    @JsonProperty
     private final String password;
 
     @JsonCreator
-    public UsernamePasswordAuthenticationRequest(String username, String password) {
+    public UsernamePasswordAuthenticationRequest(@JsonProperty("username") String username,
+                                                 @JsonProperty("password") String password) {
         this.username = username;
         this.password = password;
     }
