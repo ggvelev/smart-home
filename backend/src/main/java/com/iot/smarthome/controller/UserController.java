@@ -27,71 +27,64 @@ package com.iot.smarthome.controller;
 
 import com.iot.smarthome.dto.CreateUserRequest;
 import com.iot.smarthome.dto.UserDetails;
-import com.iot.smarthome.service.UserService;
+import com.iot.smarthome.service.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.annotation.security.RolesAllowed;
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
 
 import static com.iot.smarthome.controller.Constants.*;
-import static com.iot.smarthome.security.SecurityConstants.ROLE_ADMIN;
 
 /**
  * Exposes REST APIs for management and CRUD operations on {@link com.iot.smarthome.entity.UserEntity}
  */
-//@Validated
 @RestController
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private UserAccountService userAccountService;
 
     /**
      * List all registered users
      *
      * @return response containing all registered users
      */
-    @RolesAllowed(ROLE_ADMIN)
     @GetMapping(USERS)
     public ResponseEntity<List<UserDetails>> listUsers() {
-        // TODO: sorting, paging and filtering to be added
-        return ResponseEntity.ok(userService.listUsers());
+        // TODO: sorting, paging and filtering to be implemented
+        return ResponseEntity.ok(userAccountService.listUsers());
     }
 
     /**
      * Handles user registration request
      *
      * @param user new user details
-     * @return response with location of the newly created resource
+     * @return response with location of the newly created resource and the resource itself
      */
     @PostMapping(USERS)
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody CreateUserRequest user) {
-        final UserDetails userDetails = userService.registerUser(user);
+    public ResponseEntity<UserDetails> registerUser(@RequestBody CreateUserRequest user) {
+        final UserDetails userDetails = userAccountService.registerUser(user);
         final URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path("/{userId}")
-                .buildAndExpand(userDetails.uuid)
+                .buildAndExpand(userDetails.getUuid())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(userDetails);
     }
 
     /**
      * Retrieve details about a user
      *
      * @param userId user's UUID
-     * @return
+     * @return user
      */
-    @RolesAllowed(ROLE_ADMIN)
     @GetMapping(USER_BY_ID)
     public ResponseEntity<UserDetails> getUser(@PathVariable String userId) {
-        return ResponseEntity.ok().body(userService.findByUuid(UUID.fromString(userId)));
+        return ResponseEntity.ok().body(userAccountService.findByUuid(userId));
     }
 
     @PutMapping(USER_BY_ID)
@@ -107,9 +100,10 @@ public class UserController {
      * @return
      */
     @DeleteMapping(USER_BY_ID)
-    public ResponseEntity<Object> removeUser(@PathVariable String userId, @RequestParam boolean softDelete) {
+    public ResponseEntity<Void> removeUser(@PathVariable String userId, @RequestParam boolean softDelete) {
         // if ROLE_ADMIN -> immediately remove, or else -> delete/deactivate with(out?) confirmation
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        userAccountService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -118,7 +112,7 @@ public class UserController {
      * @return
      */
     @PostMapping(USER_ACTIVATION)
-    public ResponseEntity<Object> activateUser(@PathVariable String userId) {
+    public ResponseEntity<Object> activateUserAccount(@PathVariable String userId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -130,9 +124,9 @@ public class UserController {
      * @return
      */
     @PostMapping(USER_RECOVERY)
-    public ResponseEntity<Object> recoverUser(@PathVariable String userId,
-                                              @RequestParam(value = "recovery-id", required = false)
-                                                      String recoveryId) {
+    public ResponseEntity<Object> recoverUserAccount(@PathVariable String userId,
+                                                     @RequestParam(value = "recovery-id", required = false)
+                                                             String recoveryId) {
         // if recoveryId provided -> finish account recovery | otherwise initiate recovery
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
