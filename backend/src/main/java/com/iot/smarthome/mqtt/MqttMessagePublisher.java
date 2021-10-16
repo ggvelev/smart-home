@@ -25,64 +25,61 @@
 
 package com.iot.smarthome.mqtt;
 
-import com.hivemq.client.mqtt.datatypes.MqttTopicFilter;
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.datatypes.MqttTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
-
 /**
- * Component for creating MQTT subscriptions
+ * A publisher for MQTT messages
  */
 @Component
-public class GenericMqttMessageSubscriber {
+public class MqttMessagePublisher {
 
-    private static final Logger log = LoggerFactory.getLogger(GenericMqttMessageSubscriber.class);
+    private static final Logger log = LoggerFactory.getLogger(MqttMessagePublisher.class);
 
     private final MqttClient mqttClient;
+    private final ObjectMapper objectMapper;
 
-    public GenericMqttMessageSubscriber(MqttClient mqttClient) {
+    public MqttMessagePublisher(MqttClient mqttClient, ObjectMapper objectMapper) {
         this.mqttClient = mqttClient;
+        this.objectMapper = objectMapper;
     }
 
     /**
-     * Subscribe to the given topic with the specified callback
+     * Publishes the given payload to the topic specified by first deserializing it to byte array
      *
-     * @param topic    MQTT topic to subscribe
-     * @param callback {@link Consumer} to execute
+     * @param topic   where to publish the payload
+     * @param payload the message to publish
      */
-    public void subscribe(String topic, Consumer<Mqtt3Publish> callback) {
-        log.info("Subscribing to '{}'", topic);
-        mqttClient.get().subscribeWith()
-                .addSubscription()
-                .topicFilter(MqttTopicFilter.of(topic))
-                .applySubscription()
-                .callback(callback)
+    public void publish(String topic, Object payload) {
+        try {
+            publish(topic, objectMapper.writeValueAsBytes(payload));
+        } catch (JsonProcessingException e) {
+            log.error("Error on deserialization of MQTT publish payload");
+        }
+    }
+
+    /**
+     * Publishes the given payload to the topic with QoS 2 {@link MqttQos#EXACTLY_ONCE}
+     *
+     * @param topic   where to publish the payload
+     * @param payload the message to publish (as byte array)
+     */
+    public void publish(String topic, byte[] payload) {
+        mqttClient.get().publishWith()
+                .topic(MqttTopic.of(topic))
+                .qos(MqttQos.EXACTLY_ONCE)
+                .payload(payload)
                 .send()
-                .whenComplete((ack, ex) -> {
+                .whenComplete((mqttPub, ex) -> {
                     if (ex != null) {
-                        log.error("Error when subscribing to '{}' - {}", topic, ex);
+                        log.error("Error when publishing to '{}' - {}", topic, ex);
                     } else {
-                        log.info("Successfully subscribed to '{}'", topic);
-                    }
-                });
-    }
-
-    /**
-     * Unsubscribes from a given topic
-     *
-     * @param topic the topic to unsubscribe from
-     */
-    public void unsubscribe(String topic) {
-        log.info("Unsubscribing from '{}'", topic);
-        mqttClient.get().unsubscribeWith()
-                .topicFilter(MqttTopicFilter.of(topic))
-                .send()
-                .whenComplete((ack, ex) -> {
-                    if (ex != null) {
-                        log.error("Error when unsubscribing from '{}' - {}", topic, ex);
+                        log.info("Successfully published to '{}'", topic);
                     }
                 });
     }
