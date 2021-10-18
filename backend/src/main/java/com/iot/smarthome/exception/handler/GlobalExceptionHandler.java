@@ -30,6 +30,8 @@ import com.iot.smarthome.exception.InvalidEmailException;
 import com.iot.smarthome.exception.PasswordStrengthException;
 import com.iot.smarthome.exception.UserAlreadyExistsException;
 import com.iot.smarthome.exception.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,36 +41,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * A global handler intercepting exceptions during HTTP requests
  */
 @RestControllerAdvice
-public class RestExceptionHandler {
+public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(RuntimeException e) {
-        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+        log.error("Exception thrown", e);
+        return toErrorDetails(e);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+        return toErrorDetails(e);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserAlreadyExistsException(UserNotFoundException e) {
-        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+        return toErrorDetails(e);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorResponse handlePasswordStrengthException(PasswordStrengthException e) {
-        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+        return toErrorDetails(e);
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorResponse handleInvalidEmailException(InvalidEmailException e) {
-        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+        return toErrorDetails(e);
     }
 
+    private ErrorResponse toErrorDetails(Exception e) {
+        return new ErrorResponse(e.getClass().getSimpleName(), e.getMessage());
+    }
 }
