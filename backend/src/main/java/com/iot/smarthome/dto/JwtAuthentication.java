@@ -55,6 +55,15 @@ public class JwtAuthentication {
         return token;
     }
 
+    /**
+     * Return only the leading and trailing five characters of the token
+     *
+     * @return obscured token
+     */
+    public String getTokenObscured() {
+        return token.substring(0, 5) + "..." + token.substring(token.length() - 5);
+    }
+
     public UserDetails getUserDetails() {
         return userDetails;
     }
@@ -86,7 +95,7 @@ public class JwtAuthentication {
     @Override
     public String toString() {
         return "JwtAuthentication{" +
-                "token='" + token.substring(0, 5) + token.substring(token.length() - 5) + '\'' +
+                "token='" + getTokenObscured() + '\'' +
                 ", userDetails=" + userDetails +
                 '}';
     }

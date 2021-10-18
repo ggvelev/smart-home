@@ -44,6 +44,15 @@ public class BearerAuthenticationToken extends AbstractAuthenticationToken {
         return this.token;
     }
 
+    /**
+     * Return only the leading and trailing five characters of the token
+     *
+     * @return obscured token
+     */
+    public String getTokenObscured() {
+        return token.substring(0, 5) + "..." + token.substring(token.length() - 5);
+    }
+
     @Override
     public Object getCredentials() {
         return this.getToken();
@@ -53,6 +62,7 @@ public class BearerAuthenticationToken extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return this.getToken();
     }
+
 
     @Override
     public boolean equals(Object o) {

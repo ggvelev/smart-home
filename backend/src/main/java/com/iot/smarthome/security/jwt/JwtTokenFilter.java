@@ -86,7 +86,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Validate the token:
         if (token == null || !jwtTokenVerifier.verifyToken(token)) {
-            log.debug("Did not process request since no bearer token present");
+            log.info("Did not process request since no bearer token present");
             filterChain.doFilter(request, response);
             return;
         }

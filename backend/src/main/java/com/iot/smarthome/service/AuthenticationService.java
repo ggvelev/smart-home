@@ -87,19 +87,19 @@ public class AuthenticationService {
 
     private void validateUserAccountStatus(UserEntity user) {
         if (user.isLocked()) {
-            log.debug("Failed to authenticate since user account is locked");
+            log.info("Failed to authenticate since user account is locked");
             throw new LockedException("User account is locked");
         }
         if (!user.isEnabled()) {
-            log.debug("Failed to authenticate since user account is disabled");
+            log.info("Failed to authenticate since user account is disabled");
             throw new DisabledException("User is disabled");
         }
         if (user.isExpired()) {
-            log.debug("Failed to authenticate since user account is expired");
+            log.info("Failed to authenticate since user account is expired");
             throw new AccountExpiredException("User account has expired");
         }
         if (user.isCredentialsExpired()) {
-            log.debug("Failed to authenticate since user account credentials have expired");
+            log.info("Failed to authenticate since user account credentials have expired");
             throw new CredentialsExpiredException("User credentials have expired");
         }
     }

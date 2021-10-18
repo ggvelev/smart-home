@@ -57,7 +57,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         // Create the successful authentication:
         final AbstractAuthenticationToken auth = createJwtAuthenticationToken(jwt);
         auth.setDetails(bearer.getDetails());
-        log.debug("Authenticated token {}", bearer.getToken());
+        log.info("Authenticated token {}", bearer.getTokenObscured());
 
         return auth;
     }
@@ -72,6 +72,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             return this.jwtHandler.decode(bearer.getToken());
         } catch (JwtException failed) {
+            log.error("Error on authentication with {}", bearer.getTokenObscured());
             throw new AuthenticationServiceException(failed.getMessage(), failed);
         }
     }
