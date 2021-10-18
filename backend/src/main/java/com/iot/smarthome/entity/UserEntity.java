@@ -86,7 +86,9 @@ public class UserEntity {
     @Column(name = "credentials_expired")
     private boolean credentialsExpired;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.MERGE,
+            CascadeType.REFRESH})
     @JoinTable(name = "user_authority",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id")
@@ -198,6 +200,10 @@ public class UserEntity {
 
     public void setAuthorities(Set<AuthorityEntity> authorities) {
         this.authorities = authorities;
+    }
+
+    public void addAuthority(AuthorityEntity authority) {
+        authorities.add(authority);
     }
 
     public boolean hasAnyAuthority(String authority) {

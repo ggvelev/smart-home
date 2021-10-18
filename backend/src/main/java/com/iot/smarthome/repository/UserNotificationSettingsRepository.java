@@ -23,39 +23,29 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.dto;
+package com.iot.smarthome.repository;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iot.smarthome.entity.UserNotificationSettingsEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-/**
- * Represents a user registration request
- */
-public class CreateUserRequest {
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-    private final String username;
-    private final String email;
-    private final String password;
+@Repository
+public interface UserNotificationSettingsRepository extends JpaRepository<UserNotificationSettingsEntity, Long> {
 
-    @JsonCreator
-    public CreateUserRequest(@JsonProperty("username") String username,
-                             @JsonProperty("email") String email,
-                             @JsonProperty("password") String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
+    List<UserNotificationSettingsEntity> findAllByUserId(Long userId);
 
-    public String getUsername() {
-        return username;
-    }
+    List<UserNotificationSettingsEntity> findAllByUserUuid(UUID userUuid);
 
-    public String getEmail() {
-        return email;
-    }
+    Optional<UserNotificationSettingsEntity> findByUserUuid(UUID userUuid);
 
-    public String getPassword() {
-        return password;
-    }
+    List<UserNotificationSettingsEntity> findAllByUserUuidAndNotificationType(UUID userUuid, String notificationType);
+
+    List<UserNotificationSettingsEntity> findAllByUserIdAndDeviceId(Long userId, Long deviceId);
+
+    List<UserNotificationSettingsEntity> findAllByUserUuidAndDeviceUuid(UUID userId, UUID deviceId);
 
 }

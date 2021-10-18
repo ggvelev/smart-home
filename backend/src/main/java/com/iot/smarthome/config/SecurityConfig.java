@@ -113,6 +113,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(GET, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN)
                 .antMatchers(PUT, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(DELETE, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(GET, USER_NOTIFICATION_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(PUT, USER_NOTIFICATION_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
 
                 // User must be authenticated (and not "remembered") for any other request
                 .anyRequest().fullyAuthenticated()

@@ -25,37 +25,28 @@
 
 package com.iot.smarthome.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Represents a user registration request
- */
-public class CreateUserRequest {
+import java.util.List;
 
-    private final String username;
-    private final String email;
-    private final String password;
+public class UserNotificationSettings {
 
-    @JsonCreator
-    public CreateUserRequest(@JsonProperty("username") String username,
-                             @JsonProperty("email") String email,
-                             @JsonProperty("password") String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
+    private final String deviceId;
+
+    private final List<NotificationSetting> notificationSettings;
+
+    public UserNotificationSettings(
+            @JsonProperty("deviceId") String deviceId,
+            @JsonProperty("notificationSettings") List<NotificationSetting> notificationSettings) {
+        this.deviceId = deviceId;
+        this.notificationSettings = notificationSettings;
     }
 
-    public String getUsername() {
-        return username;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public String getEmail() {
-        return email;
+    public List<NotificationSetting> getNotificationSettings() {
+        return notificationSettings;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
 }

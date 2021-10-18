@@ -27,7 +27,10 @@ package com.iot.smarthome.controller;
 
 import com.iot.smarthome.dto.CreateUserRequest;
 import com.iot.smarthome.dto.UserDetails;
+import com.iot.smarthome.dto.UserNotificationSettings;
+import com.iot.smarthome.security.RequestingUserOrAdminAllowed;
 import com.iot.smarthome.service.UserAccountService;
+import com.iot.smarthome.service.UserNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +50,9 @@ public class UserController {
 
     @Autowired
     private UserAccountService userAccountService;
+
+    @Autowired
+    private UserNotificationService userNotificationService;
 
     /**
      * List all registered users
@@ -112,7 +118,7 @@ public class UserController {
      * @return
      */
     @PostMapping(USER_ACTIVATION)
-    public ResponseEntity<Object> activateUserAccount(@PathVariable String userId) {
+    public ResponseEntity<Object> activateUserAccount() {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
@@ -124,11 +130,25 @@ public class UserController {
      * @return
      */
     @PostMapping(USER_RECOVERY)
-    public ResponseEntity<Object> recoverUserAccount(@PathVariable String userId,
-                                                     @RequestParam(value = "recovery-id", required = false)
-                                                             String recoveryId) {
+    public ResponseEntity<Object> recoverUserAccount(
+            @RequestParam(value = "recovery-id", required = false) String recoveryId) {
         // if recoveryId provided -> finish account recovery | otherwise initiate recovery
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @RequestingUserOrAdminAllowed
+    @GetMapping(USER_NOTIFICATION_SETTINGS)
+    public ResponseEntity<List<UserNotificationSettings>> getNotificationSettings(@PathVariable String userId) {
+        List<UserNotificationSettings> settings = userNotificationService.getUserNotificationSettings(userId);
+        return ResponseEntity.ok(settings);
+    }
+
+    @RequestingUserOrAdminAllowed
+    @PutMapping(USER_NOTIFICATION_SETTINGS)
+    public ResponseEntity<UserNotificationSettings> updateNotificationSettings(
+            @PathVariable String userId,
+            @RequestBody UserNotificationSettings settings) {
+        final UserNotificationSettings updated = userNotificationService.updateUserSettings(userId, settings);
+        return ResponseEntity.ok(updated);
+    }
 }

@@ -27,35 +27,32 @@ package com.iot.smarthome.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iot.smarthome.notification.NotificationType;
 
-/**
- * Represents a user registration request
- */
-public class CreateUserRequest {
+public class NotificationSetting {
 
-    private final String username;
-    private final String email;
-    private final String password;
+    private final NotificationType type; // Slack, Email, Viber, etc
+    private final String destination;    // if type==Slack -> then a channel or user (#channel, @username), or type==Email -> user@domain.com
+    private final boolean enabled;
 
     @JsonCreator
-    public CreateUserRequest(@JsonProperty("username") String username,
-                             @JsonProperty("email") String email,
-                             @JsonProperty("password") String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
+    public NotificationSetting(@JsonProperty("type") NotificationType type,
+                               @JsonProperty("destination") String destination,
+                               @JsonProperty("enabled") boolean enabled) {
+        this.type = type;
+        this.destination = destination;
+        this.enabled = enabled;
     }
 
-    public String getUsername() {
-        return username;
+    public NotificationType getType() {
+        return type;
     }
 
-    public String getEmail() {
-        return email;
+    public String getDestination() {
+        return destination;
     }
 
-    public String getPassword() {
-        return password;
+    public boolean isEnabled() {
+        return enabled;
     }
-
 }

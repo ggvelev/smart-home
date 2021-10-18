@@ -47,9 +47,12 @@ public class Constants {
     public static final String DEVICE_COMMANDS = DEVICE_BY_ID + "/commands";
     public static final String DEVICE_COMMANDS_HISTORY = DEVICE_COMMANDS + "/history";
 
+
     public static final String USERS = API_BASE + "/users";
     public static final String USER_BY_ID = USERS + "/{userId}";
-    public static final String USER_ACTIVATION = USER_BY_ID + "/activation";
-    public static final String USER_RECOVERY = USER_BY_ID + "/recover-account";
+    public static final String USER_ACTIVATION = USERS + "/activation";
+    public static final String USER_RECOVERY = USERS + "/recover-account";
+
+    public static final String USER_NOTIFICATION_SETTINGS = USER_BY_ID + "/notification-settings";
 
 }
