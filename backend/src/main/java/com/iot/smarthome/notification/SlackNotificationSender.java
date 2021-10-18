@@ -27,7 +27,8 @@ package com.iot.smarthome.notification;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.SlackApiException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +37,10 @@ import java.io.IOException;
 /**
  * Component for sending Slack notification messages
  */
-@Slf4j
 @Component
 public class SlackNotificationSender {
+
+    private static final Logger log = LoggerFactory.getLogger(SlackNotificationSender.class);
 
     /**
      * Slack API token

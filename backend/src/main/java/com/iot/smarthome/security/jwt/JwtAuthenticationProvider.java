@@ -7,7 +7,8 @@ import com.iot.smarthome.dto.UserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -31,8 +32,9 @@ import static com.iot.smarthome.security.jwt.JwtClaimConstants.USER_UUID;
  * @see BearerAuthenticationToken
  * @see JwtAuthenticationToken
  */
-@Slf4j
 public class JwtAuthenticationProvider implements AuthenticationProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
 
     private final JwtTokenHandler jwtHandler;
 

@@ -26,7 +26,8 @@
 package com.iot.smarthome.security.jwt;
 
 import com.iot.smarthome.exception.MalformedBearerTokenException;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -52,9 +53,10 @@ import java.io.IOException;
  *
  * @see org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter
  */
-@Slf4j
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private final AuthorizationHeaderBearerTokenResolver bearerTokenResolver = new AuthorizationHeaderBearerTokenResolver();
     private final AuthenticationEntryPoint authenticationEntryPoint = (request, response, authException) -> {
