@@ -88,11 +88,13 @@ public class UserController {
      * @param userId user's UUID
      * @return user
      */
+    @RequestingUserOrAdminAllowed
     @GetMapping(USER_BY_ID)
     public ResponseEntity<UserDetails> getUser(@PathVariable String userId) {
         return ResponseEntity.ok().body(userAccountService.findByUuid(userId));
     }
 
+    @RequestingUserOrAdminAllowed
     @PutMapping(USER_BY_ID)
     public ResponseEntity<Object> updateUserDetails(@PathVariable String userId,
                                                     @RequestBody Object updateUserDetails) {
@@ -105,6 +107,7 @@ public class UserController {
      * @param userId
      * @return
      */
+    @RequestingUserOrAdminAllowed
     @DeleteMapping(USER_BY_ID)
     public ResponseEntity<Void> removeUser(@PathVariable String userId, @RequestParam boolean softDelete) {
         // if ROLE_ADMIN -> immediately remove, or else -> delete/deactivate with(out?) confirmation
