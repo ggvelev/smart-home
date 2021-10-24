@@ -23,30 +23,21 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.repository;
+package com.iot.smarthome.entity;
 
-import com.iot.smarthome.entity.UserNotificationSettingsEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.function.Predicate;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+public enum DevicePropertyValueType {
 
-@Repository
-public interface UserNotificationSettingsRepository extends JpaRepository<UserNotificationSettingsEntity, Long> {
+    BINARY,
+    PERCENTAGE,
+    FLOAT_NUMBER,
+    INTEGER,
+    POSITIVE_INTEGER,
+    //---
+    BOOL,
+    INT,
+    FLOAT,
+    STRING;
 
-    List<UserNotificationSettingsEntity> findAllByDeviceUuidAndEnabledTrue(UUID deviceUuid);
-
-    List<UserNotificationSettingsEntity> findAllByUserId(Long userId);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuid(UUID userUuid);
-
-    Optional<UserNotificationSettingsEntity> findByUserUuid(UUID userUuid);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndNotificationType(UUID userUuid, String notificationType);
-
-    List<UserNotificationSettingsEntity> findAllByUserIdAndDeviceId(Long userId, Long deviceId);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndDeviceUuid(UUID userId, UUID deviceId);
 }

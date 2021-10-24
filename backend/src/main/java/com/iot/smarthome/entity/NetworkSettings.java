@@ -23,30 +23,49 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.repository;
+package com.iot.smarthome.entity;
 
-import com.iot.smarthome.entity.UserNotificationSettingsEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import javax.persistence.Embeddable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+@Embeddable
+public class NetworkSettings {
 
-@Repository
-public interface UserNotificationSettingsRepository extends JpaRepository<UserNotificationSettingsEntity, Long> {
+    private String macAddress;
+    private String ipAddress;
+    private String networkCidr;
 
-    List<UserNotificationSettingsEntity> findAllByDeviceUuidAndEnabledTrue(UUID deviceUuid);
+    public NetworkSettings() {
+        // pass
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserId(Long userId);
+    public NetworkSettings(String macAddress, String ipAddress, String networkCidr) {
+        this.macAddress = macAddress;
+        this.ipAddress = ipAddress;
+        this.networkCidr = networkCidr;
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserUuid(UUID userUuid);
+    public String getMacAddress() {
+        return macAddress;
+    }
 
-    Optional<UserNotificationSettingsEntity> findByUserUuid(UUID userUuid);
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndNotificationType(UUID userUuid, String notificationType);
+    public String getIpAddress() {
+        return ipAddress;
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserIdAndDeviceId(Long userId, Long deviceId);
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndDeviceUuid(UUID userId, UUID deviceId);
+    public String getNetworkCidr() {
+        return networkCidr;
+    }
+
+    public void setNetworkCidr(String networkCidr) {
+        this.networkCidr = networkCidr;
+    }
+
 }

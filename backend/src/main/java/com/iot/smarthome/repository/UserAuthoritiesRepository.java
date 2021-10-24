@@ -12,5 +12,4 @@ public interface UserAuthoritiesRepository extends JpaRepository<AuthorityEntity
     Optional<AuthorityEntity> findByAuthority(String authority);
 
     AuthorityEntity getByAuthority(String authority);
-
 }

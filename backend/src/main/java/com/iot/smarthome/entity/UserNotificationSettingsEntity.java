@@ -61,9 +61,10 @@ public class UserNotificationSettingsEntity {
     private String notificationDestination;
 
     @Column(name = "enabled")
-    private boolean enabled;
+    private Boolean enabled;
 
     public UserNotificationSettingsEntity() {
+        // pass
     }
 
     public UserNotificationSettingsEntity(Long id, Integer version, UserEntity user,
@@ -127,11 +128,11 @@ public class UserNotificationSettingsEntity {
         this.notificationDestination = notificationDestination;
     }
 
-    public boolean isEnabled() {
+    public Boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 }

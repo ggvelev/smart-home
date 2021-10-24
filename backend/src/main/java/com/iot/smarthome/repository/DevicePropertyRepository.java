@@ -23,25 +23,26 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.security;
+package com.iot.smarthome.repository;
 
-import com.iot.smarthome.security.jwt.JwtAuthenticationToken;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.iot.smarthome.entity.DevicePropertyEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-/**
- * Guards the annotated REST controller handler method allowing either 'ROLE_ADMIN' user or the currently authenticated
- * principal to access own resources (when there's a '{userId}' path variable in the URI its value should match the one
- * in {@link JwtAuthenticationToken#getPrincipal()}.getUuid()).
- * <p>
- * Examples:
- * <li> GET /api/users/123 , the authenticated principal has id=123 -> authorized
- * <li> GET /api/users/123 , the authenticated principal has 'ROLE-ADMIN' -> authorized
- * <li> GET /api/users/123 , the authenticated principal has id=456 -> unauthorized, access to resource is forbidden
- */
-@Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("(#userId == principal.uuid.toString()) or principal.authorities.contains('ROLE_ADMIN')")
-public @interface RequestingUserOrAdminAllowed {
+@Repository
+public interface DevicePropertyRepository extends JpaRepository<DevicePropertyEntity, Long> {
+
+    List<DevicePropertyEntity> findAllByDeviceId(Long deviceId);
+
+    Optional<List<DevicePropertyEntity>> findAllByDeviceUuid(UUID deviceUuid);
+
+    Optional<DevicePropertyEntity> findByDeviceUuidAndUuid(UUID deviceUuid, UUID propertyUuid);
+
+    boolean existsByDeviceUuidAndUuid(UUID deviceUuid, UUID propertyUuid);
+
+    void deleteByUuid(UUID propertyUuid);
 }

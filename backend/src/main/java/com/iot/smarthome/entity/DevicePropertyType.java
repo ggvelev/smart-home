@@ -23,30 +23,23 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.repository;
+package com.iot.smarthome.entity;
 
-import com.iot.smarthome.entity.UserNotificationSettingsEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+public enum DevicePropertyType {
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+    ON_OFF_RELAY(DevicePropertyValueType.BINARY),
+    DIMMER(DevicePropertyValueType.PERCENTAGE),
+    MEASURE_FLOAT(DevicePropertyValueType.FLOAT_NUMBER),
+    MEASURE_INT(DevicePropertyValueType.INTEGER),
+    MEASURE_PERCENTAGE(DevicePropertyValueType.PERCENTAGE);
 
-@Repository
-public interface UserNotificationSettingsRepository extends JpaRepository<UserNotificationSettingsEntity, Long> {
+    private final DevicePropertyValueType type;
 
-    List<UserNotificationSettingsEntity> findAllByDeviceUuidAndEnabledTrue(UUID deviceUuid);
+    DevicePropertyType(DevicePropertyValueType type) {
+        this.type = type;
+    }
 
-    List<UserNotificationSettingsEntity> findAllByUserId(Long userId);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuid(UUID userUuid);
-
-    Optional<UserNotificationSettingsEntity> findByUserUuid(UUID userUuid);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndNotificationType(UUID userUuid, String notificationType);
-
-    List<UserNotificationSettingsEntity> findAllByUserIdAndDeviceId(Long userId, Long deviceId);
-
-    List<UserNotificationSettingsEntity> findAllByUserUuidAndDeviceUuid(UUID userId, UUID deviceId);
+    public DevicePropertyValueType getType() {
+        return type;
+    }
 }
