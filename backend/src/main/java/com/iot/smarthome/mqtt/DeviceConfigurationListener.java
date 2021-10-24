@@ -27,7 +27,7 @@ package com.iot.smarthome.mqtt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iot.smarthome.annotation.Listener;
-import com.iot.smarthome.dto.DeviceDetails;
+import com.iot.smarthome.dto.DeviceConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +35,11 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 
+/**
+ * Listener for device configuration changes
+ */
 @Listener
-public class DeviceConfigurationListener implements MqttListener<DeviceDetails> {
+public class DeviceConfigurationListener implements MqttListener<DeviceConfiguration> {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceConfigurationListener.class);
 
@@ -57,13 +60,13 @@ public class DeviceConfigurationListener implements MqttListener<DeviceDetails> 
     private void setUpSubscription() {
         subscriber.subscribe(
                 TopicTemplateVariableType.formatTopic(topic),
-                msg -> objectMapper.readValue(msg.getPayloadAsBytes(), DeviceDetails.class),
+                msg -> objectMapper.readValue(msg.getPayloadAsBytes(), DeviceConfiguration.class),
                 this::onReceived
         );
     }
 
     @Override
-    public void onReceived(DeviceDetails deviceDetails) {
+    public void onReceived(DeviceConfiguration deviceConfiguration) {
         // TODO
         //  log details
         //  store in DB
