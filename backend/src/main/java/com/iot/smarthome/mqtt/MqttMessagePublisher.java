@@ -59,7 +59,7 @@ public class MqttMessagePublisher {
         try {
             publish(topic, objectMapper.writeValueAsBytes(payload));
         } catch (JsonProcessingException e) {
-            log.error("Error on deserialization of MQTT publish payload");
+            log.error("Error on deserialization of MQTT publish message payload", e);
         }
     }
 
@@ -78,10 +78,9 @@ public class MqttMessagePublisher {
                 .whenComplete((mqttPub, ex) -> {
                     if (ex != null) {
                         log.error("Error when publishing to '{}' - {}", topic, ex);
-                    } else {
-                        log.info("Successfully published to '{}'", topic);
+                        return;
                     }
+                    log.info("Successfully published to '{}'", topic);
                 });
     }
-
 }

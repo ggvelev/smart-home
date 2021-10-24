@@ -42,9 +42,11 @@ public class MqttSubscriber {
     private static final Logger log = LoggerFactory.getLogger(MqttSubscriber.class);
 
     private final MqttClient mqttClient;
+    private final MqttSubscriptionsCache subscriptionsCache;
 
-    public MqttSubscriber(MqttClient mqttClient) {
+    public MqttSubscriber(MqttClient mqttClient, MqttSubscriptionsCache subscriptionsCache) {
         this.mqttClient = mqttClient;
+        this.subscriptionsCache = subscriptionsCache;
     }
 
     /**
@@ -73,10 +75,11 @@ public class MqttSubscriber {
                 .send()
                 .whenComplete((ack, ex) -> {
                     if (ex != null) {
-                        log.error("Error subscribing to '{}' - {}", topic, ex);
-                    } else {
-                        log.info("Successfully subscribed to '{}'", topic);
+                        log.error("Error subscribing to '{}': {}", topic, ex);
+                        return;
                     }
+                    subscriptionsCache.add(topic, callback);
+                    log.info("Successfully subscribed to '{}'", topic);
                 });
     }
 
@@ -92,9 +95,11 @@ public class MqttSubscriber {
                 .send()
                 .whenComplete((ack, ex) -> {
                     if (ex != null) {
-                        log.error("Error unsubscribing from '{}' - {}", topic, ex);
+                        log.error("Error unsubscribing from '{}': {}", topic, ex);
+                        return;
                     }
+                    subscriptionsCache.remove(topic);
+                    log.info("Successfully unsubscribed from '{}'", topic);
                 });
     }
-
 }

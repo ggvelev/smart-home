@@ -25,36 +25,33 @@
 
 package com.iot.smarthome.mqtt;
 
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.iot.smarthome.exception.MqttMessageConversionException;
+import com.hivemq.client.mqtt.datatypes.MqttTopicFilter;
 
-import java.util.function.Function;
+public enum TopicTemplateVariableType {
 
-/**
- * Generic interface representing a converter from an incoming {@link Mqtt3Publish} to object of type {@link T}
- *
- * @param <T> target type for conversion from {@link Mqtt3Publish#getPayloadAsBytes()} or {@link
- *            Mqtt3Publish#getPayload()}
- * @see java.util.function.Function
- */
-@FunctionalInterface
-public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+    DEVICE_ID("{deviceId}", String.valueOf(MqttTopicFilter.SINGLE_LEVEL_WILDCARD)),
+    USER_ID("{userId}", String.valueOf(MqttTopicFilter.SINGLE_LEVEL_WILDCARD));
 
-    /**
-     * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
-     * {@link RuntimeException}
-     *
-     * @param publish incoming {@link Mqtt3Publish} message
-     * @return the MQTT message payload converted to {@link T}
-     */
-    @Override
-    default T apply(Mqtt3Publish publish) {
-        try {
-            return convert(publish);
-        } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT message conversion failed", e);
-        }
+    private final String placeholder;
+    private final String replacement;
+
+    TopicTemplateVariableType(String placeholder, String replacement) {
+        this.placeholder = placeholder;
+        this.replacement = replacement;
     }
 
-    T convert(Mqtt3Publish input) throws Exception;
+    /**
+     * Formats a given MQTT topic with template variables defined and supported by this enumeration, to MQTT topic with
+     * single-level wildcards ('+').
+     *
+     * @param mqttTopic topic with template variables (e.g. "{deviceId}, "{userId} etc.)
+     * @return formatted MQTT topic string with template variables replaced with "+"
+     * @see com.hivemq.client.mqtt.datatypes.MqttTopicFilter#SINGLE_LEVEL_WILDCARD
+     */
+    public static String formatTopic(String mqttTopic) {
+        for (TopicTemplateVariableType t : values()) {
+            mqttTopic = mqttTopic.replace(t.placeholder, t.replacement);
+        }
+        return mqttTopic;
+    }
 }

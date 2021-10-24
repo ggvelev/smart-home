@@ -23,38 +23,35 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.mqtt;
+package com.iot.smarthome.dto;
 
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.iot.smarthome.exception.MqttMessageConversionException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.function.Function;
+public class DeviceState {
 
-/**
- * Generic interface representing a converter from an incoming {@link Mqtt3Publish} to object of type {@link T}
- *
- * @param <T> target type for conversion from {@link Mqtt3Publish#getPayloadAsBytes()} or {@link
- *            Mqtt3Publish#getPayload()}
- * @see java.util.function.Function
- */
-@FunctionalInterface
-public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+    private final String value;
+    private final String type;
+    private final String unit;
 
-    /**
-     * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
-     * {@link RuntimeException}
-     *
-     * @param publish incoming {@link Mqtt3Publish} message
-     * @return the MQTT message payload converted to {@link T}
-     */
-    @Override
-    default T apply(Mqtt3Publish publish) {
-        try {
-            return convert(publish);
-        } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT message conversion failed", e);
-        }
+    @JsonCreator
+    public DeviceState(@JsonProperty("value") String value,
+                       @JsonProperty("type") String type,
+                       @JsonProperty("unit") String unit) {
+        this.value = value;
+        this.type = type;
+        this.unit = unit;
     }
 
-    T convert(Mqtt3Publish input) throws Exception;
+    public String getValue() {
+        return value;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
 }

@@ -25,36 +25,48 @@
 
 package com.iot.smarthome.mqtt;
 
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.iot.smarthome.exception.MqttMessageConversionException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iot.smarthome.annotation.Listener;
+import com.iot.smarthome.dto.DeviceDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
-import java.util.function.Function;
+import javax.annotation.PostConstruct;
 
-/**
- * Generic interface representing a converter from an incoming {@link Mqtt3Publish} to object of type {@link T}
- *
- * @param <T> target type for conversion from {@link Mqtt3Publish#getPayloadAsBytes()} or {@link
- *            Mqtt3Publish#getPayload()}
- * @see java.util.function.Function
- */
-@FunctionalInterface
-public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+@Listener
+public class DeviceConfigurationListener implements MqttListener<DeviceDetails> {
 
-    /**
-     * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
-     * {@link RuntimeException}
-     *
-     * @param publish incoming {@link Mqtt3Publish} message
-     * @return the MQTT message payload converted to {@link T}
-     */
-    @Override
-    default T apply(Mqtt3Publish publish) {
-        try {
-            return convert(publish);
-        } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT message conversion failed", e);
-        }
+    private static final Logger log = LoggerFactory.getLogger(DeviceConfigurationListener.class);
+
+    @Autowired
+    private MqttSubscriber subscriber;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Value("${mqtt.listeners.device-configuration.topic}")
+    private String topic;
+
+    @PostConstruct
+    private void init() {
+        setUpSubscription();
     }
 
-    T convert(Mqtt3Publish input) throws Exception;
+    private void setUpSubscription() {
+        subscriber.subscribe(
+                TopicTemplateVariableType.formatTopic(topic),
+                msg -> objectMapper.readValue(msg.getPayloadAsBytes(), DeviceDetails.class),
+                this::onReceived
+        );
+    }
+
+    @Override
+    public void onReceived(DeviceDetails deviceDetails) {
+        // TODO
+        //  log details
+        //  store in DB
+        //  update DB
+    }
 }

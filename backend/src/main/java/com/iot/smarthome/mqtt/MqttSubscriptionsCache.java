@@ -26,35 +26,41 @@
 package com.iot.smarthome.mqtt;
 
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.iot.smarthome.exception.MqttMessageConversionException;
+import org.springframework.stereotype.Component;
 
-import java.util.function.Function;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
-/**
- * Generic interface representing a converter from an incoming {@link Mqtt3Publish} to object of type {@link T}
- *
- * @param <T> target type for conversion from {@link Mqtt3Publish#getPayloadAsBytes()} or {@link
- *            Mqtt3Publish#getPayload()}
- * @see java.util.function.Function
- */
-@FunctionalInterface
-public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+// TODO - to be decided later what/how and if this will be implemented and is it really needed
+@Component
+public class MqttSubscriptionsCache {
+
+    private final ConcurrentMap<String, List<Consumer<Mqtt3Publish>>> cache = new ConcurrentHashMap<>();
 
     /**
-     * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
-     * {@link RuntimeException}
+     * Removes cache entry that has the specified topic as a key
      *
-     * @param publish incoming {@link Mqtt3Publish} message
-     * @return the MQTT message payload converted to {@link T}
+     * @param topic topic to remove the mapping for
      */
-    @Override
-    default T apply(Mqtt3Publish publish) {
-        try {
-            return convert(publish);
-        } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT message conversion failed", e);
-        }
+    public void remove(String topic) {
+        //        cache.computeIfPresent(topic, (theTopic, callbacks) -> callbacks.stream().filter());
     }
 
-    T convert(Mqtt3Publish input) throws Exception;
+    public void add(String topic, Consumer<Mqtt3Publish> consumer) {
+        //        cache.computeIfAbsent(topic, theTopic -> )
+    }
+
+    public Object update() {
+        return null;
+    }
+
+    public Object retrieve() {
+        return null;
+    }
+
+    public Object clear() {
+        return null;
+    }
 }
