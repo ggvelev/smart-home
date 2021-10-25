@@ -32,7 +32,6 @@ import java.util.List;
 public class UserNotificationSettings {
 
     private final String deviceId;
-
     private final List<NotificationSetting> notificationSettings;
 
     public UserNotificationSettings(
@@ -48,5 +47,38 @@ public class UserNotificationSettings {
 
     public List<NotificationSetting> getNotificationSettings() {
         return notificationSettings;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        UserNotificationSettings that = (UserNotificationSettings) o;
+
+        if (deviceId != null ? !deviceId.equals(that.deviceId) : that.deviceId != null) {
+            return false;
+        }
+        return notificationSettings != null ? notificationSettings.equals(that.notificationSettings) :
+               that.notificationSettings == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = deviceId != null ? deviceId.hashCode() : 0;
+        result = 31 * result + (notificationSettings != null ? notificationSettings.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "UserNotificationSettings{" +
+                "deviceId='" + deviceId + '\'' +
+                ", notificationSettings=" + notificationSettings +
+                '}';
     }
 }

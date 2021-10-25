@@ -26,13 +26,15 @@
 package com.iot.smarthome.exception.handler;
 
 import com.iot.smarthome.dto.ErrorResponse;
+import com.iot.smarthome.exception.DuplicateUserException;
 import com.iot.smarthome.exception.InvalidEmailException;
 import com.iot.smarthome.exception.PasswordStrengthException;
-import com.iot.smarthome.exception.UserAlreadyExistsException;
 import com.iot.smarthome.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -47,33 +49,39 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handle(Exception e) {
         log.error("Exception thrown", e);
-        return toErrorDetails(e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(toErrorDetails(e));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return toErrorDetails(e);
+    public ResponseEntity<ErrorResponse> handleDuplicateUserException(DuplicateUserException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(toErrorDetails(e));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(toErrorDetails(e));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleUserAlreadyExistsException(UserNotFoundException e) {
-        return toErrorDetails(e);
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(toErrorDetails(e));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorResponse handlePasswordStrengthException(PasswordStrengthException e) {
-        return toErrorDetails(e);
+    public ResponseEntity<ErrorResponse> handlePasswordStrengthException(PasswordStrengthException e) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(toErrorDetails(e));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorResponse handleInvalidEmailException(InvalidEmailException e) {
-        return toErrorDetails(e);
+    public ResponseEntity<ErrorResponse> handleInvalidEmailException(InvalidEmailException e) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(toErrorDetails(e));
     }
 
     private ErrorResponse toErrorDetails(Exception e) {

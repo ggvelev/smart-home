@@ -44,7 +44,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import static com.iot.smarthome.controller.Constants.*;
+import static com.iot.smarthome.controller.ApiConstants.*;
 import static com.iot.smarthome.security.SecurityConstants.*;
 import static org.springframework.http.HttpMethod.*;
 
@@ -93,7 +93,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(GET, AUTHENTICATION).permitAll()
                 .antMatchers(POST, AUTHENTICATION).permitAll()
                 .antMatchers(POST, USERS).permitAll()
-                .antMatchers(POST, USER_ACTIVATION).permitAll()
                 .antMatchers(POST, USER_RECOVERY).permitAll()
 
                 // Make access to Open API docs and SwaggerUI unrestricted: (TODO - allow only for ROLE_SWAGGER?)

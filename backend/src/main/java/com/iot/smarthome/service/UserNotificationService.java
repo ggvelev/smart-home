@@ -30,8 +30,6 @@ import com.iot.smarthome.dto.UserNotificationSettings;
 import com.iot.smarthome.entity.UserNotificationSettingsEntity;
 import com.iot.smarthome.exception.DeviceNotFoundException;
 import com.iot.smarthome.exception.UserNotFoundException;
-import com.iot.smarthome.notification.EmailNotificationSender;
-import com.iot.smarthome.notification.SlackNotificationSender;
 import com.iot.smarthome.repository.DeviceRepository;
 import com.iot.smarthome.repository.UserNotificationSettingsRepository;
 import com.iot.smarthome.repository.UserRepository;
@@ -64,16 +62,6 @@ public class UserNotificationService {
     @Autowired
     private UserNotificationSettingsRepository notificationSettingsRepo;
 
-    @Autowired
-    private EmailNotificationSender emailNotificationSender;
-
-    @Autowired
-    private SlackNotificationSender slackNotificationSender;
-
-    // TODO
-    public void sendNotification() {
-        log.info("Sending notification for event '{}' - '{}'", "EventType", "EventData");
-    }
 
     /**
      * List all event notification settings for a user
@@ -82,6 +70,7 @@ public class UserNotificationService {
      * @return {@link UserNotificationSettings}
      */
     public List<UserNotificationSettings> getUserNotificationSettings(String userId) {
+        log.info("Listing notification settings for user with UUID '{}'", userId);
         final List<UserNotificationSettingsEntity> settings = notificationSettingsRepo
                 .findAllByUserUuid(UUID.fromString(userId));
 
@@ -98,7 +87,15 @@ public class UserNotificationService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    /**
+     * Update user's notification settings related to specific device
+     *
+     * @param userId   user UUID
+     * @param settings {@link UserNotificationSettings}
+     * @return updated {@link UserNotificationSettings}
+     */
     public UserNotificationSettings updateUserSettings(String userId, UserNotificationSettings settings) {
+        // TODO: add validation // notificationSettingsValidator.validateUpdateRequest(userId, settings);
         final List<UserNotificationSettingsEntity> existingSettings = notificationSettingsRepo.
                 findAllByUserUuidAndDeviceUuid(UUID.fromString(userId), UUID.fromString(settings.getDeviceId()));
 
@@ -127,27 +124,30 @@ public class UserNotificationService {
                 .filter(es -> es.getNotificationType() == newSetting.getType())
                 .findAny();
 
+        // If newSetting of given type matches existing setting, then update the existing one:
         if (sameTypeExisting.isPresent()) {
-            // If newSetting of given type matches existing setting, then update the existing one
+            log.info("Updating existing notification setting: [{}]", newSetting);
             final UserNotificationSettingsEntity entity = sameTypeExisting.get();
             entity.setEnabled(newSetting.isEnabled());
             entity.setNotificationDestination(newSetting.getDestination());
             return notificationSettingsRepo.save(entity);
         }
 
-        // Otherwise, create new record for the given userId, deviceId and notification settings
+        // Otherwise, create new record for the given userId, deviceId and notification setting:
+        log.info("Creating new notification setting: [{}]", newSetting);
         return notificationSettingsRepo.save(toNotificationSettingsEntity(userId, deviceId, newSetting));
     }
 
-    private UserNotificationSettingsEntity toNotificationSettingsEntity(String userId, String deviceId,
+    private UserNotificationSettingsEntity toNotificationSettingsEntity(String userId,
+                                                                        String deviceId,
                                                                         NotificationSetting ns) {
         final UserNotificationSettingsEntity entity = new UserNotificationSettingsEntity();
 
         entity.setDevice(deviceRepository.findByUuid(UUID.fromString(deviceId))
-                                 .orElseThrow(() -> new DeviceNotFoundException("uuid", deviceId)));
+                                 .orElseThrow(() -> new DeviceNotFoundException("deviceUuid", deviceId)));
 
         entity.setUser(userRepository.findByUuid(UUID.fromString(userId))
-                               .orElseThrow(() -> new UserNotFoundException("uuid", userId)));
+                               .orElseThrow(() -> new UserNotFoundException("userUuid", userId)));
 
         entity.setEnabled(ns.isEnabled());
         entity.setNotificationType(ns.getType());

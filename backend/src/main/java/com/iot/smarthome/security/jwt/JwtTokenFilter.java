@@ -59,6 +59,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private static final Logger log = LoggerFactory.getLogger(JwtTokenFilter.class);
 
     private final AuthorizationHeaderBearerTokenResolver bearerTokenResolver = new AuthorizationHeaderBearerTokenResolver();
+
     private final AuthenticationEntryPoint authenticationEntryPoint = (request, response, authException) -> {
         log.error("JWT authentication failed: {}", authException.getMessage());
 
@@ -67,8 +68,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         response.addHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
     };
+
     @Autowired
     private JwtTokenVerifier jwtTokenVerifier;
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -88,7 +91,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Validate the token:
         if (token == null || !jwtTokenVerifier.verifyToken(token)) {
-            log.info("Did not process request since no bearer token present");
+            log.info("Did not process request to '{}' since no bearer token present", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -110,5 +113,4 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             log.debug("Failed to process authentication request", e);
         }
     }
-
 }

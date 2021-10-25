@@ -23,26 +23,18 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.exception;
+package com.iot.smarthome.dto;
 
-import static java.lang.String.format;
+public enum UserAccountRecoveryAction {
 
-public class DuplicateUserException extends RuntimeException {
+    /**
+     * Initiate user account recovery
+     */
+    init,
 
-    private final String field;
-    private final String value;
+    /**
+     * Finalize user account recovery
+     */
+    finish
 
-    public DuplicateUserException(String field, String value) {
-        super(format("User with %s '%s' already exists", field, value));
-        this.field = field;
-        this.value = value;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getValue() {
-        return value;
-    }
 }

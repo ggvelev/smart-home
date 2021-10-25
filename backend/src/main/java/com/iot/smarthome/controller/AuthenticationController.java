@@ -36,13 +36,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import static com.iot.smarthome.controller.Constants.AUTHENTICATION;
+import static com.iot.smarthome.controller.ApiConstants.AUTHENTICATION;
 
 /**
  * Authentication endpoints
  */
 @RestController
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController {
 
     @Autowired
@@ -71,7 +70,6 @@ public class AuthenticationController {
      */
     @PostMapping(AUTHENTICATION)
     public ResponseEntity<JwtAuthentication> authenticate(@RequestBody UsernamePasswordAuthenticationRequest request) {
-        JwtAuthentication auth = authenticationService.authenticate(request);
-        return ResponseEntity.ok().body(auth);
+        return ResponseEntity.ok().body(authenticationService.authenticate(request));
     }
 }

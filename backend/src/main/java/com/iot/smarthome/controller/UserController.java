@@ -26,13 +26,14 @@
 package com.iot.smarthome.controller;
 
 import com.iot.smarthome.dto.CreateUserRequest;
+import com.iot.smarthome.dto.UserAccountRecoveryAction;
 import com.iot.smarthome.dto.UserDetails;
 import com.iot.smarthome.dto.UserNotificationSettings;
-import com.iot.smarthome.security.RequestingUserOrAdminAllowed;
 import com.iot.smarthome.service.UserAccountService;
 import com.iot.smarthome.service.UserNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -40,10 +41,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-import static com.iot.smarthome.controller.Constants.*;
+import static com.iot.smarthome.controller.ApiConstants.*;
 
 /**
- * Exposes REST APIs for management and CRUD operations on {@link com.iot.smarthome.entity.UserEntity}
+ * Exposes REST APIs for management and CRUD operations on {@link com.iot.smarthome.entity.UserEntity}, {@link
+ * com.iot.smarthome.entity.UserNotificationSettingsEntity}.
  */
 @RestController
 public class UserController {
@@ -55,7 +57,7 @@ public class UserController {
     private UserNotificationService userNotificationService;
 
     /**
-     * List all registered users
+     * List all registered users.
      *
      * @return response containing all registered users
      */
@@ -66,7 +68,7 @@ public class UserController {
     }
 
     /**
-     * Handles user registration request
+     * Handles user registration request.
      *
      * @param user new user details
      * @return response with location of the newly created resource and the resource itself
@@ -83,18 +85,16 @@ public class UserController {
     }
 
     /**
-     * Retrieve details about a user
+     * Retrieve details about a user.
      *
      * @param userId user's UUID
      * @return user
      */
-    @RequestingUserOrAdminAllowed
     @GetMapping(USER_BY_ID)
     public ResponseEntity<UserDetails> getUser(@PathVariable String userId) {
         return ResponseEntity.ok().body(userAccountService.findByUuid(userId));
     }
 
-    @RequestingUserOrAdminAllowed
     @PutMapping(USER_BY_ID)
     public ResponseEntity<Object> updateUserDetails(@PathVariable String userId,
                                                     @RequestBody Object updateUserDetails) {
@@ -102,56 +102,80 @@ public class UserController {
     }
 
     /**
-     * Remove user registration
+     * Delete user account.
      *
-     * @param userId
-     * @return
+     * @param userId user's UUID
+     * @return {@link HttpStatus#NO_CONTENT}
      */
-    @RequestingUserOrAdminAllowed
     @DeleteMapping(USER_BY_ID)
-    public ResponseEntity<Void> removeUser(@PathVariable String userId, @RequestParam boolean softDelete) {
-        // if ROLE_ADMIN -> immediately remove, or else -> delete/deactivate with(out?) confirmation
-        userAccountService.deleteUser(userId);
+    public ResponseEntity<Void> removeUser(@PathVariable String userId,
+                                           @RequestParam(defaultValue = "false") boolean softDelete) {
+        if (softDelete) {
+            userAccountService.disableUser(userId);
+        } else {
+            userAccountService.deleteUser(userId);
+        }
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Confirm/activate newly registered user accounts
+     * Recover user account (e.g. forgotten password).
+     * <p>
+     * If <code>recovery-id</code> query parameter is present, the service will attempt to initiate the recovery process
+     * by sending account recovery URL to the provided e-mail address.
      *
-     * @return
+     * @param action      account recovery action - {@link UserAccountRecoveryAction#init} or {@link
+     *                    UserAccountRecoveryAction#finish}
+     * @param recoveryId  unique account recovery identifier
+     * @param userEmail   user email who is attempting recovery and where the recovery URL will be sent
+     * @param newPassword new password for the user
+     * @return {@link HttpStatus#ACCEPTED} or {@link HttpStatus#OK}
      */
-    @PostMapping(USER_ACTIVATION)
-    public ResponseEntity<Object> activateUserAccount() {
+    @PostMapping(USER_RECOVERY)
+    public ResponseEntity<Object> recoverUserAccount(
+            @RequestParam UserAccountRecoveryAction action,
+            @RequestParam(required = false) String recoveryId,
+            @RequestParam(required = false) String userEmail,
+            @RequestParam(required = false) String newPassword) {
+        // Initiate recovery with provided valid user email:
+        if (action == UserAccountRecoveryAction.init) {
+            // Send email with unique link (or unique code) to use for recovery finalization:
+            // userAccountService.initiateRecovery(userEmail);
+            // return ResponseEntity.accepted().build();
+        }
+
+        // Complete recovery by providing the unique recoveryId and new password:
+        if (action == UserAccountRecoveryAction.finish) {
+            // userAccountService.completeRecovery(recoveryId, newPassword);
+            // return ResponseEntity.ok().build();
+        }
+
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     /**
-     * Recover user account (e.g. forgotten password). If <code>recovery-id</code> query parameter is present, the
-     * service will attempt to complete the recovery process.
+     * Fetch all notifications settings for given user.
      *
-     * @param recoveryId
-     * @return
+     * @param userId user UUID
+     * @return List of {@link UserNotificationSettings}
      */
-    @PostMapping(USER_RECOVERY)
-    public ResponseEntity<Object> recoverUserAccount(
-            @RequestParam(value = "recovery-id", required = false) String recoveryId) {
-        // if recoveryId provided -> finish account recovery | otherwise initiate recovery
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    @RequestingUserOrAdminAllowed
     @GetMapping(USER_NOTIFICATION_SETTINGS)
     public ResponseEntity<List<UserNotificationSettings>> getNotificationSettings(@PathVariable String userId) {
-        List<UserNotificationSettings> settings = userNotificationService.getUserNotificationSettings(userId);
-        return ResponseEntity.ok(settings);
+        return ResponseEntity.ok(userNotificationService.getUserNotificationSettings(userId));
     }
 
-    @RequestingUserOrAdminAllowed
+    /**
+     * API operation for updating user notification settings for events of interest (currently limited to all events
+     * related to the device specified in {@link UserNotificationSettings#getDeviceId()}.
+     *
+     * @param userId   user UUID
+     * @param settings notification settings to update
+     * @return the updated settings
+     */
     @PutMapping(USER_NOTIFICATION_SETTINGS)
     public ResponseEntity<UserNotificationSettings> updateNotificationSettings(
             @PathVariable String userId,
             @RequestBody UserNotificationSettings settings) {
-        final UserNotificationSettings updated = userNotificationService.updateUserSettings(userId, settings);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(userNotificationService.updateUserSettings(userId, settings));
     }
 }

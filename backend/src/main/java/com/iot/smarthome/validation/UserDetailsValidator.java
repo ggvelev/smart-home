@@ -28,7 +28,7 @@ package com.iot.smarthome.validation;
 import com.iot.smarthome.dto.CreateUserRequest;
 import com.iot.smarthome.exception.InvalidEmailException;
 import com.iot.smarthome.exception.PasswordStrengthException;
-import com.iot.smarthome.exception.UserAlreadyExistsException;
+import com.iot.smarthome.exception.DuplicateUserException;
 import com.iot.smarthome.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -79,11 +79,11 @@ public class UserDetailsValidator {
         }
 
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new UserAlreadyExistsException("username", request.getUsername());
+            throw new DuplicateUserException("username", request.getUsername());
         }
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserAlreadyExistsException("email", request.getEmail());
+            throw new DuplicateUserException("email", request.getEmail());
         }
     }
 

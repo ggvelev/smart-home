@@ -4,17 +4,18 @@ services:
 
   postgres:
     image: postgres:13.4
-#    container_name: postgres
     hostname: postgres
-    #    restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
       POSTGRES_USER: ${POSTGRES_USER:-admin}
     ports:
       - "5432:5432"
+#    volumes:
+#      - ./schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+#      - ./data.sql:/docker-entrypoint-initdb.d/2-data.sql
     networks:
       - smarthome-db
-#
+
 #  influxdb:
 #    image: influxdb:2.0.8
 #    container_name: influxdb
@@ -36,7 +37,6 @@ services:
 
   mosquitto:
     image: eclipse-mosquitto:2.0.12
-#    container_name: mosquitto
     ports:
       - "1883:1883"
     networks:
@@ -47,23 +47,18 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-#    container_name: pgadmin
     links:
-      - db
-    restart: always
+      - postgres
     ports:
       - "5050:80"
-    #    volumes:
-    #      - /sessions
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-    #      PGADMIN_ENABLE_TLS: true
+    #  PGADMIN_ENABLE_TLS: true
     networks:
       - smarthome-db
 
 networks:
   smarthome-db:
   smarthome-mqtt:
-
