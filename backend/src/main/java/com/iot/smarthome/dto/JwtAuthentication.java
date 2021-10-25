@@ -26,6 +26,7 @@
 package com.iot.smarthome.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -60,6 +61,7 @@ public class JwtAuthentication {
      *
      * @return obscured token
      */
+    @JsonIgnore
     public String getTokenObscured() {
         return token.substring(0, 5) + "..." + token.substring(token.length() - 5);
     }

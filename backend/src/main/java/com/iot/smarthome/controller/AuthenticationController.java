@@ -30,12 +30,11 @@ import com.iot.smarthome.dto.UserDetails;
 import com.iot.smarthome.dto.UsernamePasswordAuthenticationRequest;
 import com.iot.smarthome.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.iot.smarthome.controller.Constants.AUTHENTICATION;
 
@@ -43,31 +42,36 @@ import static com.iot.smarthome.controller.Constants.AUTHENTICATION;
  * Authentication endpoints
  */
 @RestController
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController {
 
     @Autowired
     private AuthenticationService authenticationService;
 
     /**
-     * @param principal currently authenticated user, if any
-     * @return {@link UserDetails} for the currently authenticated user
+     * @param authentication currently authenticated user, if any
+     * @return {@link UserDetails} of the currently authenticated user. Otherwise {@link HttpStatus#UNAUTHORIZED} or
+     * {@link HttpStatus#FORBIDDEN}
      */
     @GetMapping(AUTHENTICATION)
-    public UserDetails get(Authentication principal) {
-        return (UserDetails) principal.getPrincipal();
+    public ResponseEntity<UserDetails> get(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return authentication.getPrincipal() != null ?
+               ResponseEntity.ok((UserDetails) authentication.getPrincipal()) :
+               ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     /**
      * Authenticates a user against provided username and password credentials
      *
-     * @param authRequest {@link UsernamePasswordAuthenticationRequest}
+     * @param request {@link UsernamePasswordAuthenticationRequest}
      * @return {@link JwtAuthentication}
      */
     @PostMapping(AUTHENTICATION)
-    public ResponseEntity<JwtAuthentication> authenticate(
-            @RequestBody UsernamePasswordAuthenticationRequest authRequest) {
-        JwtAuthentication auth = authenticationService.authenticate(authRequest);
+    public ResponseEntity<JwtAuthentication> authenticate(@RequestBody UsernamePasswordAuthenticationRequest request) {
+        JwtAuthentication auth = authenticationService.authenticate(request);
         return ResponseEntity.ok().body(auth);
     }
-
 }

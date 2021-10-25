@@ -45,8 +45,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import static com.iot.smarthome.controller.Constants.*;
-import static com.iot.smarthome.security.SecurityConstants.ROLE_ADMIN;
-import static com.iot.smarthome.security.SecurityConstants.ROLE_USER;
+import static com.iot.smarthome.security.SecurityConstants.*;
 import static org.springframework.http.HttpMethod.*;
 
 /**
@@ -61,6 +60,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtTokenHandler jwtTokenHandler;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     @Override
@@ -91,8 +95,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, USERS).permitAll()
                 .antMatchers(POST, USER_ACTIVATION).permitAll()
                 .antMatchers(POST, USER_RECOVERY).permitAll()
-                .antMatchers(GET, OPEN_API_DOCS).permitAll()
-                .mvcMatchers(GET, OPEN_API_UI).permitAll()
+
+                // Make access to Open API docs and SwaggerUI unrestricted: (TODO - allow only for ROLE_SWAGGER?)
+                .antMatchers(OPEN_API_DOCS).permitAll()
 
                 .antMatchers(GET, DEVICES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(POST, DEVICES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
@@ -100,6 +105,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(GET, DEVICE_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(PUT, DEVICE_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(DELETE, DEVICE_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+
+                .antMatchers(GET, DEVICE_METADATA).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(PUT, DEVICE_METADATA).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+
+                .antMatchers(GET, DEVICE_NETWORK_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(PUT, DEVICE_NETWORK_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+
+                .antMatchers(GET, DEVICE_PROPERTIES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(POST, DEVICE_PROPERTIES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+
+                .antMatchers(GET, DEVICE_PROPERTY_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(PUT, DEVICE_PROPERTY_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(DELETE, DEVICE_PROPERTY_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
 
                 .antMatchers(GET, DEVICE_CONFIGURATIONS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(POST, DEVICE_CONFIGURATIONS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
@@ -110,11 +128,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(GET, USERS).hasAnyAuthority(ROLE_ADMIN)
 
-                .antMatchers(GET, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN)
-                .antMatchers(PUT, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
-                .antMatchers(DELETE, USER_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
-                .antMatchers(GET, USER_NOTIFICATION_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
-                .antMatchers(PUT, USER_NOTIFICATION_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(GET, USER_BY_ID).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
+                .antMatchers(PUT, USER_BY_ID).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
+                .antMatchers(DELETE, USER_BY_ID).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
+
+                .antMatchers(GET, USER_NOTIFICATION_SETTINGS).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
+                .antMatchers(PUT, USER_NOTIFICATION_SETTINGS).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
+                .antMatchers(DELETE, USER_NOTIFICATION_SETTINGS).access(ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE)
 
                 // User must be authenticated (and not "remembered") for any other request
                 .anyRequest().fullyAuthenticated()
@@ -123,11 +143,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requiresChannel().anyRequest().requiresSecure()
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     //@Bean // TODO CORS configuration

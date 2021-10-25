@@ -28,7 +28,6 @@ package com.iot.smarthome.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.validation.constraints.Email;
 import java.util.Set;
 import java.util.UUID;
 
@@ -38,17 +37,15 @@ import java.util.UUID;
 public class UserDetails {
 
     private final UUID uuid;
-
     private final String username;
-
-    @Email
     private final String email;
-
     private final Set<String> authorities;
 
     @JsonCreator
-    public UserDetails(@JsonProperty("uuid") UUID uuid, @JsonProperty("username") String username,
-                       @JsonProperty("email") String email, @JsonProperty("authorities") Set<String> authorities) {
+    public UserDetails(@JsonProperty("uuid") UUID uuid,
+                       @JsonProperty("username") String username,
+                       @JsonProperty("email") String email,
+                       @JsonProperty("authorities") Set<String> authorities) {
         this.uuid = uuid;
         this.username = username;
         this.email = email;

@@ -28,6 +28,7 @@ package com.iot.smarthome.security;
 public class SecurityConstants {
 
     private SecurityConstants() {
+        // pass
     }
 
     // Authorities
@@ -35,5 +36,12 @@ public class SecurityConstants {
     public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_DEVICE = "ROLE_DEVICE";
     public static final String ROLE_DEVICE_GATEWAY = "ROLE_DEVICE_GATEWAY";
+
+    /**
+     * SpEL security expression to validate that requesting user is fully authenticated and is either accessing own
+     * resources (by user UUID) or has authority of 'ROLE_ADMIN'.
+     */
+    public static final String ADMIN_OR_AUTHENTICATED_USER_ACCESSIBLE =
+            "isFullyAuthenticated() and (hasAuthority('ROLE_ADMIN') or #userId == principal.uuid.toString())";
 
 }
