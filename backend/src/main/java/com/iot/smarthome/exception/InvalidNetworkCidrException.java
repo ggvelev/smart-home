@@ -23,48 +23,18 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.dto;
+package com.iot.smarthome.exception;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iot.smarthome.entity.NetworkSettings;
+public class InvalidNetworkCidrException extends RuntimeException {
 
-public class DeviceConfiguration {
+    private final String networkCidr;
 
-    private final NetworkSettings networkSettings;
-
-    @JsonCreator
-    public DeviceConfiguration(@JsonProperty("networkSettings") NetworkSettings networkSettings) {
-        this.networkSettings = networkSettings;
+    public InvalidNetworkCidrException(String networkCidr) {
+        super(String.format("The provided network CIDR '%s' is invalid", networkCidr));
+        this.networkCidr = networkCidr;
     }
 
-    public NetworkSettings getNetworkSettings() {
-        return networkSettings;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        DeviceConfiguration that = (DeviceConfiguration) o;
-
-        return networkSettings != null ? networkSettings.equals(that.networkSettings) : that.networkSettings == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return networkSettings != null ? networkSettings.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "DeviceConfiguration{" +
-                "networkSettings=" + networkSettings +
-                '}';
+    public String getNetworkCidr() {
+        return networkCidr;
     }
 }

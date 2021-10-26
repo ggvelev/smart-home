@@ -23,48 +23,18 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.dto;
+package com.iot.smarthome.exception;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iot.smarthome.entity.NetworkSettings;
+public class InvalidMacAddressException extends RuntimeException {
 
-public class DeviceConfiguration {
+    private final String macAddress;
 
-    private final NetworkSettings networkSettings;
-
-    @JsonCreator
-    public DeviceConfiguration(@JsonProperty("networkSettings") NetworkSettings networkSettings) {
-        this.networkSettings = networkSettings;
+    public InvalidMacAddressException(String macAddress) {
+        super(String.format("The provided MAC address '%s' is invalid", macAddress));
+        this.macAddress = macAddress;
     }
 
-    public NetworkSettings getNetworkSettings() {
-        return networkSettings;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        DeviceConfiguration that = (DeviceConfiguration) o;
-
-        return networkSettings != null ? networkSettings.equals(that.networkSettings) : that.networkSettings == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return networkSettings != null ? networkSettings.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "DeviceConfiguration{" +
-                "networkSettings=" + networkSettings +
-                '}';
+    public String getMacAddress() {
+        return macAddress;
     }
 }

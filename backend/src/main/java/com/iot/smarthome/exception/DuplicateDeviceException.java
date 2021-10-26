@@ -23,48 +23,26 @@
  *
  ******************************************************************************/
 
-package com.iot.smarthome.dto;
+package com.iot.smarthome.exception;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iot.smarthome.entity.NetworkSettings;
+import static java.lang.String.format;
 
-public class DeviceConfiguration {
+public class DuplicateDeviceException extends RuntimeException {
 
-    private final NetworkSettings networkSettings;
+    private final String field;
+    private final String value;
 
-    @JsonCreator
-    public DeviceConfiguration(@JsonProperty("networkSettings") NetworkSettings networkSettings) {
-        this.networkSettings = networkSettings;
+    public DuplicateDeviceException(String field, String value) {
+        super(format("Device with %s='%s' already exists found", field, value));
+        this.field = field;
+        this.value = value;
     }
 
-    public NetworkSettings getNetworkSettings() {
-        return networkSettings;
+    public String getField() {
+        return field;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        DeviceConfiguration that = (DeviceConfiguration) o;
-
-        return networkSettings != null ? networkSettings.equals(that.networkSettings) : that.networkSettings == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return networkSettings != null ? networkSettings.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "DeviceConfiguration{" +
-                "networkSettings=" + networkSettings +
-                '}';
+    public String getValue() {
+        return value;
     }
 }

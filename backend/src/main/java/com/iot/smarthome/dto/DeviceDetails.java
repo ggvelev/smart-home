@@ -27,44 +27,37 @@ package com.iot.smarthome.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iot.smarthome.entity.DeviceMetadata;
 import com.iot.smarthome.entity.NetworkSettings;
 
-public class DeviceConfiguration {
+import java.util.UUID;
 
+public class DeviceDetails {
+
+    private final UUID deviceId;
+    private final DeviceMetadata deviceMetadata;
     private final NetworkSettings networkSettings;
 
     @JsonCreator
-    public DeviceConfiguration(@JsonProperty("networkSettings") NetworkSettings networkSettings) {
+    public DeviceDetails(@JsonProperty("deviceId") UUID deviceId,
+                         @JsonProperty("deviceMetadata") DeviceMetadata deviceMetadata,
+                         @JsonProperty("networkSettings") NetworkSettings networkSettings) {
+        this.deviceId = deviceId;
+        this.deviceMetadata = deviceMetadata;
         this.networkSettings = networkSettings;
+
+    }
+
+    public UUID getDeviceId() {
+        return deviceId;
+    }
+
+    public DeviceMetadata getDeviceMetadata() {
+        return deviceMetadata;
     }
 
     public NetworkSettings getNetworkSettings() {
         return networkSettings;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        DeviceConfiguration that = (DeviceConfiguration) o;
-
-        return networkSettings != null ? networkSettings.equals(that.networkSettings) : that.networkSettings == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return networkSettings != null ? networkSettings.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "DeviceConfiguration{" +
-                "networkSettings=" + networkSettings +
-                '}';
-    }
 }

@@ -27,15 +27,32 @@ package com.iot.smarthome.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iot.smarthome.entity.DeviceMetadata;
 import com.iot.smarthome.entity.NetworkSettings;
 
-public class DeviceConfiguration {
+import java.util.UUID;
 
+public class DeviceRegistrationRequest {
+
+    private final UUID deviceUuid;
+    private final DeviceMetadata metadata;
     private final NetworkSettings networkSettings;
 
     @JsonCreator
-    public DeviceConfiguration(@JsonProperty("networkSettings") NetworkSettings networkSettings) {
+    public DeviceRegistrationRequest(@JsonProperty("deviceUuid") UUID deviceUuid,
+                                     @JsonProperty("metadata") DeviceMetadata metadata,
+                                     @JsonProperty("networkSettings") NetworkSettings networkSettings) {
+        this.deviceUuid = deviceUuid;
+        this.metadata = metadata;
         this.networkSettings = networkSettings;
+    }
+
+    public UUID getDeviceUuid() {
+        return deviceUuid;
+    }
+
+    public DeviceMetadata getMetadata() {
+        return metadata;
     }
 
     public NetworkSettings getNetworkSettings() {
@@ -51,20 +68,31 @@ public class DeviceConfiguration {
             return false;
         }
 
-        DeviceConfiguration that = (DeviceConfiguration) o;
+        DeviceRegistrationRequest that = (DeviceRegistrationRequest) o;
 
+        if (deviceUuid != null ? !deviceUuid.equals(that.deviceUuid) : that.deviceUuid != null) {
+            return false;
+        }
+        if (metadata != null ? !metadata.equals(that.metadata) : that.metadata != null) {
+            return false;
+        }
         return networkSettings != null ? networkSettings.equals(that.networkSettings) : that.networkSettings == null;
     }
 
     @Override
     public int hashCode() {
-        return networkSettings != null ? networkSettings.hashCode() : 0;
+        int result = deviceUuid != null ? deviceUuid.hashCode() : 0;
+        result = 31 * result + (metadata != null ? metadata.hashCode() : 0);
+        result = 31 * result + (networkSettings != null ? networkSettings.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
-        return "DeviceConfiguration{" +
-                "networkSettings=" + networkSettings +
+        return "DeviceRegistrationRequest{" +
+                "deviceUuid=" + deviceUuid +
+                ", metadata=" + metadata +
+                ", networkSettings=" + networkSettings +
                 '}';
     }
 }
