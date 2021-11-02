@@ -95,6 +95,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, USERS).permitAll()
                 .antMatchers(POST, USER_RECOVERY).permitAll()
 
+                .antMatchers("/**").permitAll()
+
                 // Make access to Open API docs and SwaggerUI unrestricted: (TODO - allow only for ROLE_SWAGGER?)
                 .antMatchers(OPEN_API_DOCS).permitAll()
 
@@ -111,6 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(GET, DEVICE_NETWORK_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(PUT, DEVICE_NETWORK_SETTINGS).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
 
+                .antMatchers(GET, DEVICE_PROPERTY_TYPES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(GET, DEVICE_PROPERTIES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(POST, DEVICE_PROPERTIES).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
 
@@ -124,6 +127,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(GET, DEVICE_CONFIGURATION_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(PUT, DEVICE_CONFIGURATION_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
                 .antMatchers(DELETE, DEVICE_CONFIGURATION_BY_ID).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+
+                .antMatchers(GET, DEVICE_STATE_HISTORY).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
+                .antMatchers(DELETE, DEVICE_STATE_HISTORY).hasAnyAuthority(ROLE_ADMIN, ROLE_USER)
 
                 .antMatchers(GET, USERS).hasAnyAuthority(ROLE_ADMIN)
 
@@ -144,11 +150,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    //@Bean // TODO CORS configuration
+    @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(false);
         config.addAllowedOrigin("https://localhost");
         config.addAllowedOrigin("http://localhost");
         config.addAllowedHeader("*");
