@@ -56,7 +56,7 @@ public class DeviceDataService {
      * @param deviceState device state change
      */
     public void storeDeviceStateUpdate(String deviceId, DeviceState deviceState) {
-        if (managementService.exists(deviceId)) {
+        if (!managementService.exists(deviceId)) {
             log.error("No device with UUID '{}' exists! Skipping device state update.", deviceId);
             return;
         }
