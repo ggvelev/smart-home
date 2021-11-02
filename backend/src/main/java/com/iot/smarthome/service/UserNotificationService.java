@@ -25,14 +25,18 @@
 
 package com.iot.smarthome.service;
 
+import com.iot.smarthome.dto.DeviceState;
 import com.iot.smarthome.dto.NotificationSetting;
 import com.iot.smarthome.dto.UserNotificationSettings;
 import com.iot.smarthome.entity.UserNotificationSettingsEntity;
 import com.iot.smarthome.exception.DeviceNotFoundException;
 import com.iot.smarthome.exception.UserNotFoundException;
+import com.iot.smarthome.notification.EmailNotificationSender;
+import com.iot.smarthome.notification.SlackNotificationSender;
 import com.iot.smarthome.repository.DeviceRepository;
 import com.iot.smarthome.repository.UserNotificationSettingsRepository;
 import com.iot.smarthome.repository.UserRepository;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +66,41 @@ public class UserNotificationService {
 
     @Autowired
     private UserNotificationSettingsRepository notificationSettingsRepo;
+
+    @Autowired
+    private EmailNotificationSender emailNotificationSender;
+
+    @Autowired
+    private SlackNotificationSender slackNotificationSender;
+
+    /**
+     * Notify users for device state change
+     *
+     * @param deviceId    device UUID
+     * @param deviceState state change
+     */
+    @Transactional(readOnly = true)
+    public void sendNotification(String deviceId, DeviceState deviceState) {
+        final List<UserNotificationSettingsEntity> preferences = notificationSettingsRepo
+                .findAllByDeviceUuidAndEnabledTrue(UUID.fromString(deviceId));
+
+        for (UserNotificationSettingsEntity uns : preferences) {
+            switch (uns.getNotificationType()) {
+                case EMAIL:
+                    emailNotificationSender.send(
+                            uns.getNotificationDestination(),
+                            "Notification update for device " + deviceId,
+                            deviceState.toString()
+                    );
+                    break;
+                case SLACK:
+                    slackNotificationSender.send(uns.getNotificationDestination(), deviceState.toString());
+                    break;
+                default:
+                    throw new NotImplementedException("Unexpected value: " + uns.getNotificationType());
+            }
+        }
+    }
 
     /**
      * List all event notification settings for a user

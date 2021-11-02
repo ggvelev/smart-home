@@ -55,7 +55,7 @@ public class EmailNotificationSender {
      * @param subject subject
      * @param text    email content
      */
-    void send(String to, String subject, String text) {
+    public void send(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(ADDRESS);
         message.setTo(to);
