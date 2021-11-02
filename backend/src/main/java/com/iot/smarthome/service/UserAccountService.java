@@ -35,6 +35,7 @@ import com.iot.smarthome.validation.UserDetailsValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,9 @@ public class UserAccountService {
     @Autowired
     private UserDetailsValidator userDetailsValidator;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     /**
      * Registers new user
      *
@@ -71,9 +75,9 @@ public class UserAccountService {
 
         final UserEntity newUser = new UserEntity();
         newUser.setUsername(request.getUsername());
-        newUser.setPassword(request.getPassword());
+        newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setEmail(request.getEmail());
-        newUser.setEnabled(false); // TODO: activation via email confirmation link
+        newUser.setEnabled(true); // TODO: activation via email confirmation link
         newUser.addAuthority(authoritiesRepository.getByAuthority(ROLE_USER));
 
         final UserEntity registered = userRepository.save(newUser);
@@ -99,7 +103,6 @@ public class UserAccountService {
      */
     @Transactional
     public void deleteUser(String userUuid) {
-        //        byUuid(userUuid);
         userRepository.deleteByUuid(UUID.fromString(userUuid));
     }
 

@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,6 +70,7 @@ public class UserNotificationService {
      * @param userId user's uuid
      * @return {@link UserNotificationSettings}
      */
+    @Transactional(readOnly = true)
     public List<UserNotificationSettings> getUserNotificationSettings(String userId) {
         log.info("Listing notification settings for user with UUID '{}'", userId);
         final List<UserNotificationSettingsEntity> settings = notificationSettingsRepo
@@ -94,6 +96,7 @@ public class UserNotificationService {
      * @param settings {@link UserNotificationSettings}
      * @return updated {@link UserNotificationSettings}
      */
+    @Transactional
     public UserNotificationSettings updateUserSettings(String userId, UserNotificationSettings settings) {
         // TODO: add validation // notificationSettingsValidator.validateUpdateRequest(userId, settings);
         final List<UserNotificationSettingsEntity> existingSettings = notificationSettingsRepo.

@@ -38,6 +38,7 @@ import com.iot.smarthome.repository.DeviceRepository;
 import com.iot.smarthome.validation.DeviceDetailsValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,11 +62,15 @@ public class DeviceManagementService {
     @Autowired
     private DeviceDetailsValidator deviceDetailsValidator;
 
+    @Autowired
+    private DeviceDataService deviceDataService;
+
     /**
      * Retrieves details for all available devices stored in DB
      *
      * @return List of {@link DeviceDetails}
      */
+    @Transactional(readOnly = true)
     public List<DeviceDetails> listAllDevices() {
         return deviceRepository.findAll().stream()
                 .map(DeviceManagementService::toDeviceDetails)
@@ -78,6 +83,7 @@ public class DeviceManagementService {
      * @param deviceId device UUID
      * @return {@link DeviceDetails} describing the device
      */
+    @Transactional(readOnly = true)
     public DeviceDetails getDevice(String deviceId) {
         return deviceRepository.findByUuid(UUID.fromString(deviceId))
                 .map(DeviceManagementService::toDeviceDetails)
@@ -90,10 +96,11 @@ public class DeviceManagementService {
      * @param request device details to register
      * @return details for the newly created device
      */
+    @Transactional
     public DeviceDetails addDevice(DeviceRegistrationRequest request) {
         deviceDetailsValidator.validateRegistrationRequest(request);
 
-        DeviceEntity device = new DeviceEntity();
+        DeviceEntity device = new DeviceEntity(request.getDeviceUuid());
         device.setMetadata(request.getMetadata());
         device.setNetworkSettings(request.getNetworkSettings());
         device = deviceRepository.save(device);
@@ -108,6 +115,7 @@ public class DeviceManagementService {
      * @param updateRequest details to update
      * @return updated device details
      */
+    @Transactional
     public DeviceDetails updateDevice(String deviceId, DeviceDetailsUpdateRequest updateRequest) {
         deviceDetailsValidator.validateUpdateRequest(deviceId, updateRequest);
 
@@ -126,11 +134,17 @@ public class DeviceManagementService {
      *
      * @param deviceId device to delete by UUID
      */
+    @Transactional
     public void removeDevice(String deviceId) {
-        if (!deviceRepository.existsByUuid(UUID.fromString(deviceId))) {
+        if (!exists(deviceId)) {
             throw new DeviceNotFoundException("deviceUuid", deviceId);
         }
         deviceRepository.deleteByUuid(UUID.fromString(deviceId));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean exists(String deviceId) {
+        return deviceRepository.existsByUuid(UUID.fromString(deviceId));
     }
 
     /**
@@ -139,6 +153,7 @@ public class DeviceManagementService {
      * @param deviceId device UUID to search properties for
      * @return all device properties
      */
+    @Transactional(readOnly = true)
     public List<DeviceProperty> listDeviceProperties(String deviceId) {
         return devicePropertyRepository.findAllByDeviceUuid(UUID.fromString(deviceId))
                 .map(ps -> ps.stream().map(DeviceManagementService::toDeviceProperty).collect(toUnmodifiableList()))
@@ -152,6 +167,7 @@ public class DeviceManagementService {
      * @param propertyId property UUID
      * @return device property if found
      */
+    @Transactional(readOnly = true)
     public DeviceProperty getDeviceProperty(String deviceId, String propertyId) {
         return devicePropertyRepository.findByDeviceUuidAndUuid(UUID.fromString(deviceId), UUID.fromString(propertyId))
                 .map(DeviceManagementService::toDeviceProperty)
@@ -165,6 +181,7 @@ public class DeviceManagementService {
      * @param deviceProperty property to add
      * @return the newly added property
      */
+    @Transactional
     public DeviceProperty addDeviceProperty(String deviceId, DeviceProperty deviceProperty) {
         final DeviceEntity device = deviceRepository.findByUuid(UUID.fromString(deviceId))
                 .orElseThrow(() -> new DeviceNotFoundException("deviceUuid", deviceId));
@@ -189,6 +206,7 @@ public class DeviceManagementService {
      * @param updateRequest details to update
      * @return updated property
      */
+    @Transactional
     public DeviceProperty updateDeviceProperty(String deviceId, String propertyId, DeviceProperty updateRequest) {
         DevicePropertyEntity property = devicePropertyRepository
                 .findByDeviceUuidAndUuid(UUID.fromString(deviceId), UUID.fromString(propertyId))
@@ -206,16 +224,20 @@ public class DeviceManagementService {
     }
 
     /**
-     * Delete device property
+     * Delete device property and all state records related to it in InfluxDB
      *
      * @param deviceId   device UUID
      * @param propertyId property UUID
      */
+    @Transactional
     public void deleteDeviceProperty(String deviceId, String propertyId) {
-        if (!devicePropertyRepository.existsByDeviceUuidAndUuid(UUID.fromString(deviceId), UUID.fromString(deviceId))) {
+        if (!devicePropertyRepository.existsByDeviceUuidAndUuid(
+                UUID.fromString(deviceId), UUID.fromString(propertyId))) {
             throw new DevicePropertyNotFoundException(deviceId, "propertyUuid", propertyId);
         }
-        devicePropertyRepository.deleteByUuid(UUID.fromString(deviceId));
+
+        devicePropertyRepository.deleteByUuid(UUID.fromString(propertyId));
+        deviceDataService.deleteHistory(deviceId, propertyId);
     }
 
     /**
@@ -248,5 +270,4 @@ public class DeviceManagementService {
                 device.getNetworkSettings()
         );
     }
-
 }

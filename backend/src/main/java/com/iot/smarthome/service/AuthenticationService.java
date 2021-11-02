@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service responsible for user authentication (via {@link UsernamePasswordAuthenticationRequest}s)
@@ -62,7 +63,10 @@ public class AuthenticationService {
      * @param auth credentials
      * @return Authentication response containing encoded and signed JWT with additional authenticated user details
      */
+    @Transactional(readOnly = true)
     public JwtAuthentication authenticate(UsernamePasswordAuthenticationRequest auth) {
+        validateAuthenticationRequest(auth);
+
         final UserEntity user = userRepository.findByUsername(auth.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("username", auth.getUsername()));
 
@@ -83,6 +87,15 @@ public class AuthenticationService {
                         user.getAuthoritiesAsSet()
                 )
         );
+    }
+
+    private void validateAuthenticationRequest(UsernamePasswordAuthenticationRequest auth) {
+        if (auth.getUsername() == null || auth.getUsername().isBlank()) {
+            throw new IllegalArgumentException("Username must not be blank");
+        }
+        if (auth.getPassword() == null || auth.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password must not be blank");
+        }
     }
 
     private void validateUserAccountStatus(UserEntity user) {
