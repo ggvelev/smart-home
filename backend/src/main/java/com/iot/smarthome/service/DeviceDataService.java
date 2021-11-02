@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -60,6 +61,12 @@ public class DeviceDataService {
             log.error("No device with UUID '{}' exists! Skipping device state update.", deviceId);
             return;
         }
+
+        // hacky, remove when devices get taught to send it themselves
+        if (deviceState.getTime() == null) {
+            deviceState.setTime(Instant.now());
+        }
+
         influxDbRepo.writeDeviceState(deviceId, deviceState);
         userNotificationService.sendNotification(deviceId, deviceState);
     }

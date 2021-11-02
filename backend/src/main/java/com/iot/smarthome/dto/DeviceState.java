@@ -25,7 +25,6 @@
 
 package com.iot.smarthome.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iot.smarthome.entity.DevicePropertyType;
 import com.iot.smarthome.entity.DevicePropertyValueType;
@@ -34,20 +33,26 @@ import java.time.Instant;
 
 public class DeviceState {
 
-    private final String value;
-    private final DevicePropertyType type;
-    private final DevicePropertyValueType valueType;
-    private final Instant time;
+    @JsonProperty("value")
+    private String value;
 
-    @JsonCreator
-    public DeviceState(@JsonProperty("value") String value,
-                       @JsonProperty("type") DevicePropertyType type,
-                       @JsonProperty("valueType") DevicePropertyValueType valueType,
-                       @JsonProperty("time") Instant time) {
+    @JsonProperty("type")
+    private DevicePropertyType type;
+
+    @JsonProperty("valueType")
+    private DevicePropertyValueType valueType;
+
+    @JsonProperty("time")
+    private Instant time;
+
+    public DeviceState(String value, DevicePropertyType type, DevicePropertyValueType valueType, Instant time) {
         this.value = value;
         this.type = type;
         this.valueType = valueType;
         this.time = time;
+    }
+
+    public DeviceState() {
     }
 
     public String getValue() {
@@ -64,6 +69,22 @@ public class DeviceState {
 
     public Instant getTime() {
         return time;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public void setType(DevicePropertyType type) {
+        this.type = type;
+    }
+
+    public void setValueType(DevicePropertyValueType valueType) {
+        this.valueType = valueType;
+    }
+
+    public void setTime(Instant time) {
+        this.time = time;
     }
 
     @Override

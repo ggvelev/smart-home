@@ -35,6 +35,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * Component for sending e-mail message notifications
  */
@@ -63,8 +65,13 @@ public class EmailNotificationSender {
         message.setText(text);
 
         try {
-            //            emailSender.send(message);
-            log.info("Email sent: {}", message);
+            CompletableFuture.runAsync(() -> emailSender.send(message)).whenComplete((unused, throwable) -> {
+                if (throwable != null) {
+                    log.error("Error sending email: ", throwable);
+                    return;
+                }
+                log.info("Email sent: {}", message);
+            });
         } catch (MailParseException e) {
             log.error("Failure when parsing message", e);
         } catch (MailAuthenticationException e) {
