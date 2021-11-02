@@ -27,19 +27,10 @@ package com.iot.smarthome.entity;
 
 public enum DevicePropertyType {
 
-    ON_OFF_RELAY(DevicePropertyValueType.BINARY),
-    DIMMER(DevicePropertyValueType.PERCENTAGE),
-    MEASURE_FLOAT(DevicePropertyValueType.FLOAT_NUMBER),
-    MEASURE_INT(DevicePropertyValueType.INTEGER),
-    MEASURE_PERCENTAGE(DevicePropertyValueType.PERCENTAGE);
+    ON_OFF,
+    DIMMER,
+    MEASURE_FLOAT,
+    MEASURE_INT,
+    MEASURE_PERCENTAGE;
 
-    private final DevicePropertyValueType type;
-
-    DevicePropertyType(DevicePropertyValueType type) {
-        this.type = type;
-    }
-
-    public DevicePropertyValueType getType() {
-        return type;
-    }
 }

@@ -25,19 +25,11 @@
 
 package com.iot.smarthome.entity;
 
-import java.util.function.Predicate;
-
 public enum DevicePropertyValueType {
 
-    BINARY,
-    PERCENTAGE,
-    FLOAT_NUMBER,
-    INTEGER,
-    POSITIVE_INTEGER,
-    //---
-    BOOL,
-    INT,
+    BOOLEAN,
     FLOAT,
-    STRING;
+    INTEGER,
+    STRING
 
 }
