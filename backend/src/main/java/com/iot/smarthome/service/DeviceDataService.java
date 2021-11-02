@@ -58,6 +58,7 @@ public class DeviceDataService {
     public void storeDeviceStateUpdate(String deviceId, DeviceState deviceState) {
         if (managementService.exists(deviceId)) {
             log.error("No device with UUID '{}' exists! Skipping device state update.", deviceId);
+            return;
         }
         influxDbRepo.writeDeviceState(deviceId, deviceState);
         userNotificationService.sendNotification(deviceId, deviceState);
