@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.iot.smarthome.annotation.Listener;
 import com.iot.smarthome.dto.DeviceState;
+import com.iot.smarthome.service.DeviceDataService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,11 @@ import org.springframework.beans.factory.annotation.Value;
 import javax.annotation.PostConstruct;
 import java.util.UUID;
 
+import static com.iot.smarthome.mqtt.TopicTemplateVariableType.DEVICE_ID;
+
+/**
+ * Listens for and handles device state updates
+ */
 @Listener
 public class DeviceStateListener implements MqttListener<Mqtt3Publish> {
 
@@ -46,38 +52,36 @@ public class DeviceStateListener implements MqttListener<Mqtt3Publish> {
     private MqttSubscriber subscriber;
 
     @Autowired
-    private MqttMessageForwarder forwarder;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private DeviceDataService deviceDataService;
 
     @Value("${mqtt.listeners.device-state.topic}")
     private String topic;
+
+    private final IncomingMqttMessageConverter<DeviceState> converter = msg ->
+            objectMapper.readValue(msg.getPayloadAsBytes(), DeviceState.class);
 
     @PostConstruct
     private void init() {
         setUpSubscription();
     }
 
-    private final MqttMessageConverter<DeviceState> converter = msg ->
-            objectMapper.readValue(msg.getPayloadAsBytes(), DeviceState.class);
-
     private void setUpSubscription() {
-        subscriber.subscribe(TopicTemplateVariableType.formatTopic(topic), this::onReceived);
+        subscriber.subscribe(TopicTemplateVariableType.subscriptionTopicFmt(topic), this::onReceived);
     }
 
     @Override
     public void onReceived(Mqtt3Publish publish) {
         // Get deviceId from topic:
-        final UUID deviceUuid = UUID.fromString(publish.getTopic().getLevels().get(1));
+        final UUID deviceUuid = UUID.fromString(publish.getTopic().getLevels().get(DEVICE_ID.getPosition(topic)));
 
         // Get payload:
         final DeviceState deviceState = converter.apply(publish);
         log.info("Received device state message from '{}': {}", deviceUuid, deviceState);
 
-        // TODO
-        //  log details
-        //  store in DB
-        //  update DB
+        // Write record to influxDB:
+        deviceDataService.storeDeviceStateUpdate(deviceUuid.toString(), deviceState);
     }
 }

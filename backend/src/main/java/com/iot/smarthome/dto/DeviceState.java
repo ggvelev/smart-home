@@ -27,31 +27,52 @@ package com.iot.smarthome.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.iot.smarthome.entity.DevicePropertyType;
+import com.iot.smarthome.entity.DevicePropertyValueType;
+
+import java.time.Instant;
 
 public class DeviceState {
 
     private final String value;
-    private final String type;
-    private final String unit;
+    private final DevicePropertyType type;
+    private final DevicePropertyValueType valueType;
+    private final Instant time;
 
     @JsonCreator
     public DeviceState(@JsonProperty("value") String value,
-                       @JsonProperty("type") String type,
-                       @JsonProperty("unit") String unit) {
+                       @JsonProperty("type") DevicePropertyType type,
+                       @JsonProperty("valueType") DevicePropertyValueType valueType,
+                       @JsonProperty("time") Instant time) {
         this.value = value;
         this.type = type;
-        this.unit = unit;
+        this.valueType = valueType;
+        this.time = time;
     }
 
     public String getValue() {
         return value;
     }
 
-    public String getType() {
+    public DevicePropertyType getType() {
         return type;
     }
 
-    public String getUnit() {
-        return unit;
+    public DevicePropertyValueType getValueType() {
+        return valueType;
+    }
+
+    public Instant getTime() {
+        return time;
+    }
+
+    @Override
+    public String toString() {
+        return "DeviceState{" +
+                "value='" + value + '\'' +
+                ", type=" + type +
+                ", valueType=" + valueType +
+                ", time=" + time +
+                '}';
     }
 }
