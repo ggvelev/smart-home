@@ -49,8 +49,10 @@ public class ApiConstants {
     public static final String DEVICE_METADATA = DEVICE_BY_ID + "/metadata";
     public static final String DEVICE_NETWORK_SETTINGS = DEVICE_BY_ID + "/network-settings";
 
+    public static final String DEVICE_PROPERTY_TYPES = DEVICES + "/property-types";
     public static final String DEVICE_PROPERTIES = DEVICE_BY_ID + "/properties";
     public static final String DEVICE_PROPERTY_BY_ID = DEVICE_PROPERTIES + "/{propertyId}";
+
     public static final String DEVICE_CONFIGURATIONS = DEVICE_BY_ID + "/configurations";
     public static final String DEVICE_CONFIGURATION_BY_ID = DEVICE_CONFIGURATIONS + "/{configurationId}";
 
@@ -58,9 +60,13 @@ public class ApiConstants {
     public static final String DEVICE_COMMAND_BY_ID = DEVICE_COMMANDS + "/{commandId}";
     public static final String DEVICE_COMMANDS_HISTORY = DEVICE_COMMANDS + "/history";
 
+    public static final String DEVICE_STATE_HISTORY = DEVICE_PROPERTY_BY_ID + "/state-history";
+
     public static final String USERS = API_BASE + "/users";
-    public static final String USER_BY_ID = USERS + "/{userId}";
     public static final String USER_RECOVERY = USERS + "/recovery";
+
+    public static final String USER_BY_ID = USERS + "/{userId}";
     public static final String USER_NOTIFICATION_SETTINGS = USER_BY_ID + "/notification-settings";
+    public static final String USER_DEVICE_NOTIFICATION_SETTINGS = USER_BY_ID + "/{deviceId}/notification-settings";
 
 }
