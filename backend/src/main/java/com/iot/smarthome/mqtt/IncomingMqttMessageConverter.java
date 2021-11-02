@@ -38,7 +38,7 @@ import java.util.function.Function;
  * @see java.util.function.Function
  */
 @FunctionalInterface
-public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+public interface IncomingMqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
 
     /**
      * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
@@ -52,7 +52,7 @@ public interface MqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
         try {
             return convert(publish);
         } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT message conversion failed", e);
+            throw new MqttMessageConversionException("MQTT incoming message conversion failed", e);
         }
     }
 

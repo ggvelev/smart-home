@@ -27,17 +27,23 @@ package com.iot.smarthome.mqtt;
 
 import com.hivemq.client.mqtt.datatypes.MqttTopicFilter;
 
+import java.util.Map;
+
+/**
+ * Utility enum for parsing and formatting MQTT topic names with placeholder variables like <b>{deviceId}</b>
+ */
 public enum TopicTemplateVariableType {
 
     DEVICE_ID("{deviceId}", String.valueOf(MqttTopicFilter.SINGLE_LEVEL_WILDCARD)),
+    COMMAND_ID("{commandId}", String.valueOf(MqttTopicFilter.SINGLE_LEVEL_WILDCARD)),
     USER_ID("{userId}", String.valueOf(MqttTopicFilter.SINGLE_LEVEL_WILDCARD));
 
     private final String placeholder;
-    private final String replacement;
+    private final String wildcardReplacement;
 
-    TopicTemplateVariableType(String placeholder, String replacement) {
+    TopicTemplateVariableType(String placeholder, String wildcardReplacement) {
         this.placeholder = placeholder;
-        this.replacement = replacement;
+        this.wildcardReplacement = wildcardReplacement;
     }
 
     /**
@@ -48,10 +54,50 @@ public enum TopicTemplateVariableType {
      * @return formatted MQTT topic string with template variables replaced with "+"
      * @see com.hivemq.client.mqtt.datatypes.MqttTopicFilter#SINGLE_LEVEL_WILDCARD
      */
-    public static String formatTopic(String mqttTopic) {
+    public static String subscriptionTopicFmt(String mqttTopic) {
         for (TopicTemplateVariableType t : values()) {
-            mqttTopic = mqttTopic.replace(t.placeholder, t.replacement);
+            mqttTopic = mqttTopic.replace(t.placeholder, t.wildcardReplacement);
         }
         return mqttTopic;
+    }
+
+    /**
+     * Formats a MQTT topic with template variables by replacing each one with respective value.
+     *
+     * @param mqttTopic         topic with template variables
+     * @param placeholderValues template variable to value mappings
+     * @return formatted MQTT topic
+     */
+    public static String publishTopicFmt(String mqttTopic, Map<TopicTemplateVariableType, String> placeholderValues) {
+        for (Map.Entry<TopicTemplateVariableType, String> entry : placeholderValues.entrySet()) {
+            TopicTemplateVariableType template = entry.getKey();
+            String value = entry.getValue();
+            mqttTopic = mqttTopic.replace(template.placeholder, value);
+        }
+        return mqttTopic;
+    }
+
+    /**
+     * Returns the position for this template variable in the topic's levels.
+     * <p>
+     * Example:
+     * <p>
+     * {@code TopicTemplateVariableType.DEVICE_ID.getPosition("device/{deviceId}/state");} // returns 1
+     * <p>
+     * {@code TopicTemplateVariableType.COMMAND_ID.getPosition("device/{deviceId}/commands/{commandId}");} // returns 3
+     *
+     * @param mqttTopic topic name with template variables
+     * @return index of this template variable in the topic's levels or -1 if not found
+     */
+    public int getPosition(String mqttTopic) {
+        return MqttTopicFilter.of(mqttTopic).getLevels().indexOf(placeholder);
+    }
+
+    public String getPlaceholder() {
+        return placeholder;
+    }
+
+    public String getWildcardReplacement() {
+        return wildcardReplacement;
     }
 }
