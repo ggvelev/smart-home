@@ -70,11 +70,11 @@ public class UserDetailsValidator {
             throw new IllegalArgumentException("Username must not be blank");
         }
 
-        if (validatePasswordStrength(request.getPassword())) {
+        if (!isPasswordStrongEnough(request.getPassword())) {
             throw new PasswordStrengthException();
         }
 
-        if (validateEmail(request.getEmail())) {
+        if (!isEmailValid(request.getEmail())) {
             throw new InvalidEmailException(request.getEmail());
         }
 
@@ -87,11 +87,11 @@ public class UserDetailsValidator {
         }
     }
 
-    private boolean validatePasswordStrength(String password) {
+    private boolean isPasswordStrongEnough(String password) {
         return password != null && !password.isBlank() && PASSWORD_PATTERN.matcher(password).matches();
     }
 
-    private boolean validateEmail(String email) {
+    private boolean isEmailValid(String email) {
         return email != null && !email.isBlank() && EMAIL_PATTERN.matcher(email).matches();
     }
 

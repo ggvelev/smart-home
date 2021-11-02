@@ -101,6 +101,7 @@ public class DeviceDetailsValidator {
     // TODO extract to a NetworkDetailsValidator
     private boolean isValidCidr(String networkCidr) {
         return networkCidr != null && !networkCidr.isBlank()
+                && networkCidr.split("/").length == 2
                 && IPV4_ADDRESS_PATTERN.matcher(networkCidr.split("/")[0]).matches()
                 && Integer.parseInt(networkCidr.split("/")[1]) >= 0
                 && Integer.parseInt(networkCidr.split("/")[1]) <= 32;
