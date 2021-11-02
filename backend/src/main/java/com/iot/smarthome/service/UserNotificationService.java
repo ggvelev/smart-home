@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 
 /**
- * Service for managing and handling notifications for events of user interest
+ * Service for managing user notification settings/preferences for events of user interest
  */
 @Service
 public class UserNotificationService {
@@ -62,7 +62,6 @@ public class UserNotificationService {
 
     @Autowired
     private UserNotificationSettingsRepository notificationSettingsRepo;
-
 
     /**
      * List all event notification settings for a user

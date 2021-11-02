@@ -33,12 +33,12 @@ import com.iot.smarthome.service.UserAccountService;
 import com.iot.smarthome.service.UserNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import static com.iot.smarthome.controller.ApiConstants.*;
@@ -162,6 +162,23 @@ public class UserController {
     @GetMapping(USER_NOTIFICATION_SETTINGS)
     public ResponseEntity<List<UserNotificationSettings>> getNotificationSettings(@PathVariable String userId) {
         return ResponseEntity.ok(userNotificationService.getUserNotificationSettings(userId));
+    }
+
+    /**
+     * TODO - "notifications" to be totally refactored, just wiring things up in order to bring demonstrable MVP!
+     * Fetch all notifications settings for given user, related to specific device
+     *
+     * @param userId   user UUID
+     * @param deviceId device UUID
+     * @return List of {@link UserNotificationSettings}
+     */
+    @GetMapping(USER_DEVICE_NOTIFICATION_SETTINGS)
+    public ResponseEntity<UserNotificationSettings> getDeviceNotificationSettings(@PathVariable String userId,
+                                                                                  @PathVariable String deviceId) {
+        return ResponseEntity.ok(userNotificationService.getUserNotificationSettings(userId).stream()
+                                         .filter(s -> s.getDeviceId().equals(deviceId))
+                                         .findAny()
+                                         .orElse(new UserNotificationSettings(deviceId, Collections.emptyList())));
     }
 
     /**
