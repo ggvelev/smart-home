@@ -57,7 +57,7 @@ public class MqttSubscriber {
      * @param callback  lambda consuming the converted message
      * @param <T>       target type of the payload carried in the incoming {@link Mqtt3Publish}
      */
-    public <T> void subscribe(String topic, MqttMessageConverter<T> converter, Consumer<T> callback) {
+    public <T> void subscribe(String topic, IncomingMqttMessageConverter<T> converter, Consumer<T> callback) {
         subscribe(topic, publish -> callback.accept(converter.apply(publish)));
     }
 
