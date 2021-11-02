@@ -59,7 +59,7 @@ public class DeviceConfigurationListener implements MqttListener<DeviceConfigura
 
     private void setUpSubscription() {
         subscriber.subscribe(
-                TopicTemplateVariableType.formatTopic(topic),
+                TopicTemplateVariableType.subscriptionTopicFmt(topic),
                 msg -> objectMapper.readValue(msg.getPayloadAsBytes(), DeviceConfiguration.class),
                 this::onReceived
         );
@@ -67,8 +67,9 @@ public class DeviceConfigurationListener implements MqttListener<DeviceConfigura
 
     @Override
     public void onReceived(DeviceConfiguration deviceConfiguration) {
+        log.info("Device configuration message received: {}", deviceConfiguration);
+
         // TODO
-        //  log details
         //  store in DB
         //  update DB
     }
