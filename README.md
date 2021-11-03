@@ -27,6 +27,9 @@ A simple client-server application for managing IoT devices.
 
 ## Usage:
 
+#### API docs:
+You can find the API docs [here](docs/README.md).
+
 ## Tests:
 
 ## Dependencies:
