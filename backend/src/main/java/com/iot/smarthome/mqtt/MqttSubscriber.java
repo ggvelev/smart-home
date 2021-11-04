@@ -58,7 +58,11 @@ public class MqttSubscriber {
      * @param <T>       target type of the payload carried in the incoming {@link Mqtt3Publish}
      */
     public <T> void subscribe(String topic, IncomingMqttMessageConverter<T> converter, Consumer<T> callback) {
-        subscribe(topic, publish -> callback.accept(converter.apply(publish)));
+        subscribe(topic, publish ->
+                converter.apply(publish).ifPresentOrElse(
+                        callback,
+                        () -> log.warn("Result of incoming message conversion is empty")
+                ));
     }
 
     /**

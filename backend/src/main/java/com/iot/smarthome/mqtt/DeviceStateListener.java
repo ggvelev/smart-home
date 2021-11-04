@@ -74,14 +74,14 @@ public class DeviceStateListener implements MqttListener<Mqtt3Publish> {
 
     @Override
     public void onReceived(Mqtt3Publish publish) {
-        // Get deviceId from topic:
-        final UUID deviceUuid = UUID.fromString(publish.getTopic().getLevels().get(DEVICE_ID.getPosition(topic)));
+        converter.apply(publish).ifPresent(deviceState -> {
+            // Get deviceId from topic:
+            final UUID deviceUuid = UUID.fromString(publish.getTopic().getLevels().get(DEVICE_ID.getPosition(topic)));
 
-        // Get payload:
-        final DeviceState deviceState = converter.apply(publish);
-        log.info("Received device state message from '{}': {}", deviceUuid, deviceState);
+            log.info("Received device state message from '{}': {}", deviceUuid, deviceState);
 
-        // Write record to influxDB:
-        deviceDataService.storeDeviceStateUpdate(deviceUuid.toString(), deviceState);
+            // Write record to influxDB:
+            deviceDataService.storeDeviceStateUpdate(deviceUuid.toString(), deviceState);
+        });
     }
 }

@@ -26,8 +26,10 @@
 package com.iot.smarthome.mqtt;
 
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.iot.smarthome.exception.MqttMessageConversionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -38,21 +40,25 @@ import java.util.function.Function;
  * @see java.util.function.Function
  */
 @FunctionalInterface
-public interface IncomingMqttMessageConverter<T> extends Function<Mqtt3Publish, T> {
+public interface IncomingMqttMessageConverter<T> extends Function<Mqtt3Publish, Optional<T>> {
+
+    Logger log = LoggerFactory.getLogger(IncomingMqttMessageConverter.class);
 
     /**
-     * Converts message to {@link T} by rethrowing any checked exceptions during conversion and wrapping them in a
-     * {@link RuntimeException}
+     * Converts message to {@link Optional}<{@link T}>. If conversion is unsuccessful, the exception is logged and
+     * {@link Optional#empty()} is returned.
      *
      * @param publish incoming {@link Mqtt3Publish} message
-     * @return the MQTT message payload converted to {@link T}
+     * @return the MQTT message payload converted to {@link T} and wrapped in {@link Optional}. {@link Optional#empty()}
+     * if conversion failed
      */
     @Override
-    default T apply(Mqtt3Publish publish) {
+    default Optional<T> apply(Mqtt3Publish publish) {
         try {
-            return convert(publish);
+            return Optional.ofNullable(convert(publish));
         } catch (Exception e) {
-            throw new MqttMessageConversionException("MQTT incoming message conversion failed", e);
+            log.error("MQTT incoming message conversion failed", e);
+            return Optional.empty();
         }
     }
 
