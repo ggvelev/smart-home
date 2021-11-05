@@ -29,8 +29,6 @@ public enum DevicePropertyType {
 
     ON_OFF,
     DIMMER,
-    MEASURE_FLOAT,
-    MEASURE_INT,
-    MEASURE_PERCENTAGE;
-
+    SENSOR_TEMPERATURE,
+    SENSOR_HUMIDITY,
 }

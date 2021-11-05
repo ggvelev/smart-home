@@ -58,15 +58,18 @@ public class DatabaseInitializer {
             );
 
             devicePropertyRepository.findAll().forEach(dp -> {
-                for (int i = 0; i < 15; i++) {
-                    influxDbRepository.writeDeviceState(
-                            dp.getDevice().getUuid().toString(), new DeviceState(
-                                    //                                    String.valueOf(1.14 * i + RandomUtils.nextInt(1, 44)),
-                                    new BigDecimal(String.valueOf(1.14 * i + RandomUtils.nextInt(1, 44))).toString(),
-                                    dp.getName(),
-                                    dp.getType(),
-                                    Instant.now().minus(i + 1, ChronoUnit.HOURS)
-                            ));
+                if (!dp.getDevice().getUuid().equals(dev1Uuid)) {
+                    for (int i = 0; i < 15; i++) {
+                        influxDbRepository.writeDeviceState(
+                                dp.getDevice().getUuid().toString(), new DeviceState(
+                                        //                                    String.valueOf(1.14 * i + RandomUtils.nextInt(1, 44)),
+                                        new BigDecimal(
+                                                String.valueOf(1.14 * i + RandomUtils.nextInt(1, 44))).toString(),
+                                        dp.getName(),
+                                        dp.getType(),
+                                        Instant.now().minus(i + 1, ChronoUnit.HOURS)
+                                ));
+                    }
                 }
             });
 
@@ -105,19 +108,19 @@ public class DatabaseInitializer {
         // Device1 props - a on-off dimmer device
         final DevicePropertyEntity dev1Prop1 = new DevicePropertyEntity();
         dev1Prop1.setDevice(device1);
-        dev1Prop1.setDisplayName("dev1Prop1-" + RandomStringUtils.randomAlphanumeric(5));
-        dev1Prop1.setName(DevicePropertyType.DIMMER);
-        dev1Prop1.setType(DevicePropertyValueType.INTEGER);
-        dev1Prop1.setWrite(Boolean.TRUE);
+        dev1Prop1.setDisplayName("Temperature");
+        dev1Prop1.setName(DevicePropertyType.SENSOR_TEMPERATURE);
+        dev1Prop1.setType(DevicePropertyValueType.FLOAT);
+        dev1Prop1.setWrite(Boolean.FALSE);
         dev1Prop1.setRead(Boolean.TRUE);
         devicePropertyRepository.save(dev1Prop1);
 
         final DevicePropertyEntity dev1Prop2 = new DevicePropertyEntity();
         dev1Prop2.setDevice(device1);
-        dev1Prop2.setDisplayName("dev1Prop2-" + RandomStringUtils.randomAlphanumeric(5));
-        dev1Prop2.setName(DevicePropertyType.ON_OFF);
-        dev1Prop2.setType(DevicePropertyValueType.BOOLEAN);
-        dev1Prop2.setWrite(Boolean.TRUE);
+        dev1Prop2.setDisplayName("Humidity");
+        dev1Prop2.setName(DevicePropertyType.SENSOR_HUMIDITY);
+        dev1Prop2.setType(DevicePropertyValueType.FLOAT);
+        dev1Prop2.setWrite(Boolean.FALSE);
         dev1Prop2.setRead(Boolean.TRUE);
         devicePropertyRepository.save(dev1Prop2);
 
@@ -125,7 +128,7 @@ public class DatabaseInitializer {
         final DevicePropertyEntity dev2Prop1 = new DevicePropertyEntity();
         dev2Prop1.setDevice(device2);
         dev2Prop1.setDisplayName("dev2Prop1-" + RandomStringUtils.randomAlphanumeric(5));
-        dev2Prop1.setName(DevicePropertyType.MEASURE_FLOAT);
+        dev2Prop1.setName(DevicePropertyType.SENSOR_HUMIDITY);
         dev2Prop1.setType(DevicePropertyValueType.FLOAT);
         dev2Prop1.setWrite(Boolean.FALSE);
         dev2Prop1.setRead(Boolean.TRUE);
@@ -153,7 +156,7 @@ public class DatabaseInitializer {
         final DevicePropertyEntity dev3Prop2 = new DevicePropertyEntity();
         dev3Prop2.setDevice(device3);
         dev3Prop2.setDisplayName("dev3Prop2-" + RandomStringUtils.randomAlphanumeric(5));
-        dev3Prop2.setName(DevicePropertyType.MEASURE_FLOAT);
+        dev3Prop2.setName(DevicePropertyType.SENSOR_TEMPERATURE);
         dev3Prop2.setType(DevicePropertyValueType.FLOAT);
         dev3Prop2.setWrite(Boolean.TRUE);
         dev3Prop2.setRead(Boolean.TRUE);
@@ -190,11 +193,11 @@ public class DatabaseInitializer {
         user.addAuthority(roleUser);
         user = userRepository.save(user);
         initializeUserNotificationSettingsRelatedTables(
-                deviceRepository.findByUuid(dev1Uuid).get(),
+                deviceRepository.findByUuid(dev3Uuid).get(),
                 user,
                 notificationSettingsRepository,
-                "#global-notifications",
-                NotificationType.SLACK
+                "user@mail.com",
+                NotificationType.EMAIL
         );
 
         UserEntity user2 = new UserEntity();
