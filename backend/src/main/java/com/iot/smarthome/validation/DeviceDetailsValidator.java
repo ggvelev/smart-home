@@ -84,7 +84,7 @@ public class DeviceDetailsValidator {
         }
     }
 
-    private void validateNetworkSettings(NetworkSettings networkSettings) {
+    public void validateNetworkSettings(NetworkSettings networkSettings) {
         if (!isValidIPv4Address(networkSettings.getIpAddress())) {
             throw new InvalidIpAddressException(networkSettings.getIpAddress());
         }

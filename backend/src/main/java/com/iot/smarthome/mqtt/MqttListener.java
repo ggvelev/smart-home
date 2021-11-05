@@ -30,7 +30,7 @@ import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 /**
  * Represents a generic MQTT listener who handles messages with actual payload of type {@link T}
  *
- * @param <T> the payload type that {@link Mqtt3Publish#getPayload()} will be mapped to
+ * @param <T> the payload type that {@link Mqtt3Publish#getPayloadAsBytes()} will be mapped to
  */
 @FunctionalInterface
 public interface MqttListener<T> {

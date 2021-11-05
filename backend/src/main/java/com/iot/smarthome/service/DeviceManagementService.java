@@ -31,6 +31,7 @@ import com.iot.smarthome.dto.DeviceProperty;
 import com.iot.smarthome.dto.DeviceRegistrationRequest;
 import com.iot.smarthome.entity.DeviceEntity;
 import com.iot.smarthome.entity.DevicePropertyEntity;
+import com.iot.smarthome.entity.NetworkSettings;
 import com.iot.smarthome.exception.DeviceNotFoundException;
 import com.iot.smarthome.exception.DevicePropertyNotFoundException;
 import com.iot.smarthome.repository.DevicePropertyRepository;
@@ -124,6 +125,19 @@ public class DeviceManagementService {
 
         device.setMetadata(updateRequest.getDeviceMetadata());
         device.setNetworkSettings(updateRequest.getNetworkSettings());
+        device = deviceRepository.save(device);
+
+        return toDeviceDetails(device);
+    }
+
+    @Transactional
+    public DeviceDetails updateDeviceNetworkSettings(String deviceId, NetworkSettings networkSettings) {
+        deviceDetailsValidator.validateNetworkSettings(networkSettings);
+
+        DeviceEntity device = deviceRepository.findByUuid(UUID.fromString(deviceId))
+                .orElseThrow(() -> new DeviceNotFoundException("deviceUuid", deviceId));
+
+        device.setNetworkSettings(networkSettings);
         device = deviceRepository.save(device);
 
         return toDeviceDetails(device);

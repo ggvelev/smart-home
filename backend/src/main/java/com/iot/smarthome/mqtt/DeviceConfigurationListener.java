@@ -26,20 +26,27 @@
 package com.iot.smarthome.mqtt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.iot.smarthome.annotation.Listener;
 import com.iot.smarthome.dto.DeviceConfiguration;
+import com.iot.smarthome.entity.NetworkSettings;
+import com.iot.smarthome.service.DeviceManagementService;
+import org.apache.commons.net.util.SubnetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
+import java.util.UUID;
+
+import static com.iot.smarthome.mqtt.TopicTemplateVariableType.DEVICE_ID;
 
 /**
  * Listener for device configuration changes
  */
 @Listener
-public class DeviceConfigurationListener implements MqttListener<DeviceConfiguration> {
+public class DeviceConfigurationListener implements MqttListener<Mqtt3Publish> {
 
     private static final Logger log = LoggerFactory.getLogger(DeviceConfigurationListener.class);
 
@@ -52,6 +59,12 @@ public class DeviceConfigurationListener implements MqttListener<DeviceConfigura
     @Value("${mqtt.listeners.device-configuration.topic}")
     private String topic;
 
+    @Autowired
+    private DeviceManagementService deviceManagementService;
+
+    private final IncomingMqttMessageConverter<DeviceConfiguration> converter = msg ->
+            objectMapper.readValue(msg.getPayloadAsBytes(), DeviceConfiguration.class);
+
     @PostConstruct
     private void init() {
         setUpSubscription();
@@ -60,17 +73,23 @@ public class DeviceConfigurationListener implements MqttListener<DeviceConfigura
     private void setUpSubscription() {
         subscriber.subscribe(
                 TopicTemplateVariableType.subscriptionTopicFmt(topic),
-                msg -> objectMapper.readValue(msg.getPayloadAsBytes(), DeviceConfiguration.class),
                 this::onReceived
         );
     }
 
     @Override
-    public void onReceived(DeviceConfiguration deviceConfiguration) {
-        log.info("Device configuration message received: {}", deviceConfiguration);
+    public void onReceived(Mqtt3Publish publish) {
+        converter.apply(publish).ifPresent(conf -> {
+            // Get deviceId from topic:
+            final UUID deviceId = UUID.fromString(publish.getTopic().getLevels().get(DEVICE_ID.getPosition(topic)));
 
-        // TODO
-        //  store in DB
-        //  update DB
+            log.info("Device configuration message received: {}", conf);
+
+            final SubnetUtils subnetUtil = new SubnetUtils(conf.getGatewayIpAddress(), conf.getGatewaySubnetMask());
+            final String cidr = subnetUtil.getInfo().getCidrSignature();
+            final NetworkSettings ns = new NetworkSettings(conf.getMacAddress(), conf.getIpAddress(), cidr);
+
+            deviceManagementService.updateDeviceNetworkSettings(deviceId.toString(), ns);
+        });
     }
 }
